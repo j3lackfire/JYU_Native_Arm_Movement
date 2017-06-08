@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Watson_Stroke_Arm</string>
+    <string name="action_settings">Settings</string>
+
+
+    <!-- So this file is like a sepup file-->
+
+    <!-- Setup for the first page-->
+    <string name="first_page_description">This is the \nMAIN page !!!</string>
+    <string name="first_button_to_second_page">Go to next page</string>
+
+    <!-- Setup for the first page-->
+    <string name="second_page_description">This is the\nSECOND page !!!</string>
+    <string name="second_page_button_back_to_main">Back to main page</string>
+
+</resources>
