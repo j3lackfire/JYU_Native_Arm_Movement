@@ -6,26 +6,24 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-public class SecondActivity extends AppCompatActivity {
+public class DoctorMode extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_second);
+        setContentView(R.layout.activity_doctor_mode);
 
-        Button backToMainPageButton = (Button) findViewById(R.id.back_to_main_page_button);
+        Button backToMainPageButton = (Button) findViewById(R.id.button_back_to_main_page);
         backToMainPageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToFirstPage();
+                goToMainPage();
             }
         });
-
     }
 
-    private void goToFirstPage() {
+    private void goToMainPage() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-
     }
 }

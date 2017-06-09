@@ -5,12 +5,16 @@
 
     <!-- So this file is like a sepup file-->
 
-    <!-- Setup for the first page-->
-    <string name="first_page_description">This is the \nMAIN page !!!</string>
-    <string name="first_button_to_second_page">Go to next page</string>
+    <!-- Setup for the main page-->
+    <string name="main_page_description">Welcome to the \nSTROKE ARM TEST \nAPPLICATION</string>
+    <string name="main_page_button_setup_mode">Setup mode</string>
+    <string name="main_page_button_doctor_mode">Doctor mode</string>
 
-    <!-- Setup for the first page-->
-    <string name="second_page_description">This is the\nSECOND page !!!</string>
-    <string name="second_page_button_back_to_main">Back to main page</string>
+    <string name="button_back_to_main">Back to main page</string>
 
+    <!-- Setup mode page -->
+    <string name="setup_mode_description">Welcome to\nSETUP MODE</string>
+
+    <!-- Doctor mode page -->
+    <string name="doctor_mode_description">DOCTOR MODE \nThis page is under construction</string>
 </resources>
