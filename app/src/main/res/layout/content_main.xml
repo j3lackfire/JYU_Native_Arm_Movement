@@ -69,21 +69,4 @@
         tools:layout_constraintRight_creator="1"
         tools:layout_constraintTop_creator="1" />
 
-    <TextView
-        android:id="@+id/main_page_report_field"
-        android:layout_width="141dp"
-        android:layout_height="43dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.926"
-        tools:layout_editor_absoluteX="80dp"
-        tools:layout_editor_absoluteY="425dp" />
-
 </android.support.constraint.ConstraintLayout>

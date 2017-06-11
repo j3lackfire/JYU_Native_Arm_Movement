@@ -13,8 +13,8 @@
     <string name="button_back_to_main">Back to main page</string>
 
     <!-- Setup mode page -->
-    <string name="setup_mode_description">Welcome to\nSETUP MODE</string>
+    <string name="setup_mode_description">SETUP MODE</string>
 
     <!-- Doctor mode page -->
-    <string name="doctor_mode_description">DOCTOR MODE \nThis page is under construction</string>
+    <string name="doctor_mode_description">DOCTOR MODE \nUnder construction</string>
 </resources>
