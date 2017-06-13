@@ -102,6 +102,23 @@ public class SetupLogic {
         return currentSetupStep == SetupStep.Finish;
     }
 
+    public boolean isTrackingMotion () {
+        switch (currentSetupStep) {
+            case Not_Initialized:
+            case Reading_Instruction:
+            default:
+                return false;
+
+            case Right_Hand_Down:
+            case Right_Hand_Front:
+            case Right_Hand_Up:
+            case Left_Hand_Down:
+            case Left_Hand_Front:
+            case Left_Hand_Up:
+                return true;
+        }
+    }
+
     private SetupStep getNextStep(SetupStep step) {
         switch (step) {
             case Not_Initialized:

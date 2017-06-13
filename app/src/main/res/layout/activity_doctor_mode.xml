@@ -41,8 +41,8 @@
 
     <TextView
         android:id="@+id/current_sensor_data"
-        android:layout_width="349dp"
-        android:layout_height="153dp"
+        android:layout_width="347dp"
+        android:layout_height="180dp"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
@@ -61,7 +61,7 @@
         android:layout_width="162dp"
         android:layout_height="42dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="303dp"
+        android:layout_marginTop="322dp"
         android:text="Save Sensor Data"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
