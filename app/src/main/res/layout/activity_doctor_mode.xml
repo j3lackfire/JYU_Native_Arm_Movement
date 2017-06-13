@@ -40,54 +40,46 @@
         app:layout_constraintVertical_bias="0.178" />
 
     <TextView
-        android:id="@+id/test_function_description"
-        android:layout_width="362dp"
-        android:layout_height="51dp"
+        android:id="@+id/current_sensor_data"
+        android:layout_width="349dp"
+        android:layout_height="153dp"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
-        android:text="Test function: A valued entered by the user (string) will be saved to the hard-disk and display later."
+        android:text="Current sensor data"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.526"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.346" />
+        app:layout_constraintVertical_bias="0.415" />
 
     <Button
-        android:id="@+id/button_save_user_input"
-        android:layout_width="70dp"
-        android:layout_height="41dp"
+        android:id="@+id/button_save_sensor_data"
+        android:layout_width="162dp"
+        android:layout_height="42dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="239dp"
-        android:text="Save"
+        android:layout_marginTop="303dp"
+        android:text="Save Sensor Data"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/user_input_text"
-        android:layout_marginLeft="8dp" />
-
-    <EditText
-        android:id="@+id/user_input_text"
-        android:layout_width="279dp"
-        android:layout_height="44dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="234dp"
-        android:ems="10"
-        android:hint="Type something to be saved here !"
-        android:inputType="textPersonName"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintHorizontal_bias="0.52" />
 
     <TextView
-        android:id="@+id/report_text"
-        android:layout_width="273dp"
-        android:layout_height="132dp"
+        android:id="@+id/saved_sensor_data"
+        android:layout_width="320dp"
+        android:layout_height="131dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginTop="300dp"
-        android:text="TextView"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="364dp"
+        android:text="saved sensor data"
         android:textSize="16sp"
+        app:layout_constraintHorizontal_bias="0.4"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>
