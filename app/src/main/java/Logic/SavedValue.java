@@ -16,13 +16,13 @@ import java.io.IOException;
 public class SavedValue {
     public long timeStamp;
 
-    public float acceX;
-    public float acceY;
-    public float acceZ;
+    public double acceX;
+    public double acceY;
+    public double acceZ;
 
-    public float gyroX;
-    public float gyroY;
-    public float gyroZ;
+    public double gyroX;
+    public double gyroY;
+    public double gyroZ;
 
     //constructor with default value
     public SavedValue() {
@@ -41,13 +41,13 @@ public class SavedValue {
         timeStamp = _time;
     }
 
-    public void setAcce(float x,float y, float z) {
+    public void setAcce(double x,double y, double z) {
         acceX = x;
         acceY = y;
         acceZ = z;
     }
 
-    public void setGyro(float x,float y, float z) {
+    public void setGyro(double x,double y, double z) {
         gyroX = x;
         gyroY = y;
         gyroZ = z;
