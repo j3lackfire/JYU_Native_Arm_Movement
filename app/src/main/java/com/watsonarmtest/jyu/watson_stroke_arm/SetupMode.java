@@ -8,6 +8,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.AudioAttributes;
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.os.Vibrator;
@@ -35,17 +36,6 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
 
     private boolean isDataSaved;
 
-    private float refreshFrequency = 50; //0.05 second
-    private long positionTimer = 0;
-
-    private double[] savedAccelerationData = {-1,-1,-1};
-    private double[] savedGyroData = {-1,-1,-1};
-
-    private long stationaryTimer = 0;
-    private long maxStationaryTime = 2000;
-
-    private double maximumDeltaAcceleration = 0.5;
-    private double maximumDeltaGyro = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +68,6 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
                 onNextStepButtonClicked();
             }
         });
-
 
         SetupLogic.getInstance().prepareLogic();
 
@@ -154,6 +143,12 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
             "\nLeft hand up: " + sharedPref.getString(SetupLogic.getInstance().getSetupKey(SetupStep.Left_Hand_Down), "-");
     }
 
+    //audio stuffs
+    private void playNextStepAudio() {
+        MediaPlayer nextStep = MediaPlayer.create(SetupMode.this,R.raw.next_step);
+        nextStep.start();
+    }
+
     //sensor stuffs
     @Override
     protected void onResume() {
@@ -201,23 +196,14 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
                     setupReportText.setText(setupReportDisplayText);
 
                     //track the motion and stuffs
-                    positionTimer += deltaTime;
-                    stationaryTimer += deltaTime;
-                    if (positionTimer >= refreshFrequency) {
-                        //check if there are significant movement
-                        if (isSignificantMovementDetected()) {
-                            //reset the timer
-                            stationaryTimer = 0;
-                            //vibrate the phone
-                            vibrator.vibrate(40);
-                        }
-                        //save the new data anyway
-                        savedAccelerationData = mySensorManager.getAccelerationData();;
-                        savedGyroData = mySensorManager.getGyroData();
+                    mySensorManager.updateSensorManager(deltaTime);
+                    if (mySensorManager.getVibrateTime() > 0) {
+                        vibrator.vibrate(mySensorManager.getVibrateTime());
                     }
-                    if (stationaryTimer >= maxStationaryTime) {
+                    if (mySensorManager.shouldSaveUserPositionData()) {
                         saveUserPositionData();
-                        stationaryTimer = 0;
+                        playNextStepAudio();
+                        mySensorManager.resetAllTimer();
                     }
                 }
             }
@@ -225,22 +211,4 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
         }
     };
 
-    private boolean isSignificantMovementDetected() {
-        for (int i = 0; i < 3; i ++) {
-            if (mySensorManager.getAccelerationData()[i] > maximumDeltaAcceleration) {
-                return true;
-            }
-        }
-        double deltaGyro = 0;
-        double[] cachedSensorData = mySensorManager.getGyroData();
-        for (int i = 0; i < 3; i ++) {
-            double delta = (savedGyroData[i] - cachedSensorData[i]) * (savedGyroData[i] - cachedSensorData[i]);
-            deltaGyro += delta;
-        }
-        deltaGyro = Math.sqrt(deltaGyro);
-        if (deltaGyro >= maximumDeltaGyro) {
-            return true;
-        }
-        return false;
-    }
 }

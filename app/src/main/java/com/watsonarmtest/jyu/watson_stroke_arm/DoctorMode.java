@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.SensorEventListener;
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -17,7 +18,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 
 import Logic.MySensorManager;
-import Logic.SavedValue;
 
 public class DoctorMode extends AppCompatActivity implements SensorEventListener {
 
@@ -33,10 +33,6 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
 
     //sensor and stuff
     private MySensorManager mySensorManager;
-//    private SensorManager sensorManager;
-//    private Sensor linearAccelerationSensor;
-//    private Sensor gyroscopeSensor;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,10 +93,15 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         editor.putString(savedSensorDataKey, savedString);
         editor.commit();
 
+        playNextStepAudio();
         //Use this to read data from the shared preferences
 //        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 //        String reportText = sharedPreferences.getString(userSavedKey, "NOT EXISTED");
+    }
 
+    private void playNextStepAudio() {
+        MediaPlayer nextStep = MediaPlayer.create(DoctorMode.this,R.raw.next_step);
+        nextStep.start();
     }
 
     //sensor stuffs
