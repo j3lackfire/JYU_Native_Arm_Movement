@@ -144,8 +144,32 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
     }
 
     //audio stuffs
-    private void playNextStepAudio() {
-        MediaPlayer nextStep = MediaPlayer.create(SetupMode.this,R.raw.next_step);
+    private void playNextStepAudio(SetupStep currentSetupStep) {
+        MediaPlayer nextStep;
+        switch (currentSetupStep) {
+            case Right_Hand_Down:
+                nextStep = MediaPlayer.create(SetupMode.this,R.raw.right_hand_down_position);
+                break;
+            case Right_Hand_Front:
+                nextStep = MediaPlayer.create(SetupMode.this,R.raw.right_hand_front_position);
+                break;
+            case Right_Hand_Up:
+                nextStep = MediaPlayer.create(SetupMode.this,R.raw.right_hand_up_position);
+                break;
+            case Left_Hand_Down:
+                nextStep = MediaPlayer.create(SetupMode.this,R.raw.left_hand_down_position);
+                break;
+            case Left_Hand_Front:
+                nextStep = MediaPlayer.create(SetupMode.this,R.raw.left_hand_front_position);
+                break;
+            case Left_Hand_Up:
+                nextStep = MediaPlayer.create(SetupMode.this,R.raw.left_hand_up_position);
+                break;
+
+            default:
+                nextStep = null;
+
+        }
         nextStep.start();
     }
 
@@ -202,7 +226,7 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
                     }
                     if (mySensorManager.shouldSaveUserPositionData()) {
                         saveUserPositionData();
-                        playNextStepAudio();
+                        playNextStepAudio(SetupLogic.getInstance().getCurrentSetupStep());
                         mySensorManager.resetAllTimer();
                     }
                 }

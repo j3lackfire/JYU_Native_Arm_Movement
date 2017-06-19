@@ -119,6 +119,8 @@ public class SetupLogic {
         }
     }
 
+
+
     private SetupStep getNextStep(SetupStep step) {
         switch (step) {
             case Not_Initialized:
