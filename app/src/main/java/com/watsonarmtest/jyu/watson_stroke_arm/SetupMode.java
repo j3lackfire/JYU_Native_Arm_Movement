@@ -7,7 +7,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -20,12 +19,13 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import Logic.MySensorManager;
+import Logic.PositionManager;
 import Logic.SetupLogic;
 import Logic.SetupStep;
 
 public class SetupMode extends AppCompatActivity implements SensorEventListener {
 
-    private Button buttonNextStep;
+    Button buttonStartSetup;
 
     private MySensorManager mySensorManager;
     private Vibrator vibrator;
@@ -53,19 +53,19 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         //button and stuff
-        Button backToMainPageButton = (Button) findViewById(R.id.button_back_to_main_page);
-        backToMainPageButton.setOnClickListener(new View.OnClickListener() {
+        Button buttonBackToMainPage = (Button) findViewById(R.id.button_back_to_main_page);
+        buttonBackToMainPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onBackPressed();
             }
         });
 
-        buttonNextStep = (Button) findViewById(R.id.setup_button_next_step);
-        buttonNextStep.setOnClickListener(new View.OnClickListener() {
+        buttonStartSetup= (Button) findViewById(R.id.button_start_setup);
+        buttonStartSetup.setOnClickListener(new View.OnClickListener() {
             @Override
-             public void onClick(View v) {
-                onNextStepButtonClicked();
+            public void onClick(View v) {
+                toNextStep();
             }
         });
 
@@ -93,6 +93,7 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
     private void saveUserPositionData() {
         String setupKey = SetupLogic.getInstance().getCurrentSetupKey();
         isDataSaved = true;
+        PositionManager.getInstance().registerNextPosition();
         if (setupKey.equals("Invalid")) {
             //throw some exception or something here
         } else {
@@ -109,11 +110,13 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
                 mySensorManager.getSensorDataJSONPretty();
             TextView setupReportText = (TextView) findViewById(R.id.setup_report_text);
             setupReportText.setText(setupReportDisplayText);
-
         }
     }
 
-    private void onNextStepButtonClicked() {
+    private void toNextStep() {
+        if (SetupLogic.getInstance().getCurrentSetupStep() == SetupStep.Reading_Instruction) {
+            buttonStartSetup.setVisibility(View.INVISIBLE);
+        }
         SetupLogic.getInstance().toNextStep();
         //display the instruction to the user
         isDataSaved = false;
@@ -228,6 +231,12 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
                         saveUserPositionData();
                         playNextStepAudio(SetupLogic.getInstance().getCurrentSetupStep());
                         mySensorManager.resetAllTimer();
+                    }
+                } else { //if the data is saved, that means this step is completed, then we wait until the user start moving to track again
+                    mySensorManager.updateSensorManager(deltaTime);
+                    if (mySensorManager.getVibrateTime() > 0) {
+                        vibrator.vibrate(mySensorManager.getVibrateTime());
+                        toNextStep();
                     }
                 }
             }
