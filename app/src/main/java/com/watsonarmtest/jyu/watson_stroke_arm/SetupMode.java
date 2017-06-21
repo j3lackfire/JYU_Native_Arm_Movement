@@ -116,6 +116,7 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
     private void toNextStep() {
         if (SetupLogic.getInstance().getCurrentSetupStep() == SetupStep.Reading_Instruction) {
             buttonStartSetup.setVisibility(View.INVISIBLE);
+            playNextStepAudio(SetupLogic.getInstance().getCurrentSetupStep());
         }
         SetupLogic.getInstance().toNextStep();
         //display the instruction to the user
@@ -150,23 +151,26 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
     private void playNextStepAudio(SetupStep currentSetupStep) {
         MediaPlayer nextStep;
         switch (currentSetupStep) {
-            case Right_Hand_Down:
+            case Reading_Instruction:
                 nextStep = MediaPlayer.create(SetupMode.this,R.raw.right_hand_down_position);
                 break;
-            case Right_Hand_Front:
+            case Right_Hand_Down:
                 nextStep = MediaPlayer.create(SetupMode.this,R.raw.right_hand_front_position);
                 break;
-            case Right_Hand_Up:
+            case Right_Hand_Front:
                 nextStep = MediaPlayer.create(SetupMode.this,R.raw.right_hand_up_position);
                 break;
-            case Left_Hand_Down:
+            case Right_Hand_Up:
                 nextStep = MediaPlayer.create(SetupMode.this,R.raw.left_hand_down_position);
                 break;
-            case Left_Hand_Front:
+            case Left_Hand_Down:
                 nextStep = MediaPlayer.create(SetupMode.this,R.raw.left_hand_front_position);
                 break;
-            case Left_Hand_Up:
+            case Left_Hand_Front:
                 nextStep = MediaPlayer.create(SetupMode.this,R.raw.left_hand_up_position);
+                break;
+            case Left_Hand_Up:
+                nextStep = MediaPlayer.create(SetupMode.this,R.raw.finish);
                 break;
 
             default:
