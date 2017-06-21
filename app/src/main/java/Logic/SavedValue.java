@@ -16,42 +16,70 @@ import java.io.IOException;
 public class SavedValue {
     public long timeStamp;
 
-    public double acceX;
-    public double acceY;
-    public double acceZ;
+    public double posX;
+    public double posY;
+    public double posZ;
 
-    public double gyroX;
-    public double gyroY;
-    public double gyroZ;
+    public double veloX;
+    public double veloY;
+    public double veloZ;
+
+//    public double acceX;
+//    public double acceY;
+//    public double acceZ;
+
+//    public double gyroX;
+//    public double gyroY;
+//    public double gyroZ;
 
     //constructor with default value
     public SavedValue() {
         timeStamp = -1;
 
-        acceX = -1;
-        acceY = -1;
-        acceZ = -1;
+        posX = -1;
+        posY = -1;
+        posZ = -1;
 
-        gyroX = -1;
-        gyroY = -1;
-        gyroZ = -1;
+        veloX = -1;
+        veloY = -1;
+        veloZ = -1;
+
+//        acceX = -1;
+//        acceY = -1;
+//        acceZ = -1;
+//
+//        gyroX = -1;
+//        gyroY = -1;
+//        gyroZ = -1;
     }
 
     public void setTimeStamp(long _time) {
         timeStamp = _time;
     }
 
-    public void setAcce(double x,double y, double z) {
-        acceX = x;
-        acceY = y;
-        acceZ = z;
+    public void setPos(double x, double y,double z) {
+        posX = x;
+        posY = y;
+        posZ = z;
     }
 
-    public void setGyro(double x,double y, double z) {
-        gyroX = x;
-        gyroY = y;
-        gyroZ = z;
+    public void setVelocity(double x, double y, double z) {
+        veloX = x;
+        veloY = y;
+        veloZ = z;
     }
+
+//    public void setAcce(double x,double y, double z) {
+//        acceX = x;
+//        acceY = y;
+//        acceZ = z;
+//    }
+
+//    public void setGyro(double x,double y, double z) {
+//        gyroX = x;
+//        gyroY = y;
+//        gyroZ = z;
+//    }
 
     //return this class as a json
     //somehow, the function name getJsonString is used by the lib, so if we have the function name

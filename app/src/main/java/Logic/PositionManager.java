@@ -1,7 +1,5 @@
 package Logic;
 
-import static Logic.Velocity.getVelocity;
-
 /**
  * Created by Le Pham Minh Duc on 6/19/2017.
  */
@@ -22,33 +20,49 @@ public class PositionManager {
     */
     private Velocity currentVelocity = new Velocity(-1,-1,-1);
     private Position cachedPosition = new Position(-1,-1,-1);
-    public Position[] setPositions = new Position[6];
-    private int currentTrackingPosition = -1;
+    public Position[] savedPositions = new Position[6];
+    private int currentTrackingPositionIndex = -1;
 
     public PositionManager() {
-        currentTrackingPosition = -1;
+        currentTrackingPositionIndex = -1;
+        savedPositions = new Position[6];
+        currentVelocity = new Velocity(-1,-1,-1);
+        cachedPosition = new Position(-1,-1,-1);
     }
 
-    public void updatePosition(double x, double y, double z, double deltaTime) {
-        if (currentTrackingPosition == -1 || currentTrackingPosition == 2) {
+    public void updatePosition(double acceX, double acceY, double acceZ, double deltaTime) {
+        if (currentTrackingPositionIndex == -1 || currentTrackingPositionIndex == 2) {
             return;
         }
-        currentVelocity.add(Velocity.getVelocity(x,y,z,deltaTime));
+        currentVelocity.add(Velocity.getVelocity(acceX,acceY,acceZ,deltaTime));
         cachedPosition.add(Position.getPosition(currentVelocity.x, currentVelocity.y, currentVelocity.z, deltaTime));
     }
 
+    //For right down and left down.
     private void registerInitialPosition(int index) {
-        setPositions[index] = new Position(0,0,0);
-    }
-
-    public void registerNextPosition() {
-        currentTrackingPosition ++;
+        savedPositions[index] = new Position(0,0,0);
         currentVelocity = new Velocity(0,0,0);
         cachedPosition = new Position(0,0,0);
-        if (currentTrackingPosition == 0 || currentTrackingPosition == 3) {
-            registerInitialPosition(currentTrackingPosition);
+    }
+
+    public void registerPosition() {
+        currentTrackingPositionIndex++;
+        if (currentTrackingPositionIndex == 0 || currentTrackingPositionIndex == 3) {
+            registerInitialPosition(currentTrackingPositionIndex);
         } else {
-            setPositions[currentTrackingPosition] = cachedPosition;
+            savedPositions[currentTrackingPositionIndex] = cachedPosition;
+            currentVelocity = new Velocity(0,0,0);
+            cachedPosition = new Position(0,0,0);
         }
+    }
+
+    public double[] getCurrentPosition() {
+        if (currentTrackingPositionIndex <  0) {
+            return new double[] {-1,-1,-1};
+        }
+        return new double[] {
+            savedPositions[currentTrackingPositionIndex].x,
+            savedPositions[currentTrackingPositionIndex].y,
+            savedPositions[currentTrackingPositionIndex].z };
     }
 }

@@ -93,7 +93,7 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
     private void saveUserPositionData() {
         String setupKey = SetupLogic.getInstance().getCurrentSetupKey();
         isDataSaved = true;
-        PositionManager.getInstance().registerNextPosition();
+        PositionManager.getInstance().registerPosition();
         if (setupKey.equals("Invalid")) {
             //throw some exception or something here
         } else {
@@ -224,15 +224,20 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
 
                     //track the motion and stuffs
                     mySensorManager.updateSensorManager(deltaTime);
+                    //if the phone is moving, we need to vibrate it
                     if (mySensorManager.getVibrateTime() > 0) {
                         vibrator.vibrate(mySensorManager.getVibrateTime());
                     }
+                    //if the phone is stationary for a long enough period of time,
+                    //we save the position data
                     if (mySensorManager.shouldSaveUserPositionData()) {
                         saveUserPositionData();
                         playNextStepAudio(SetupLogic.getInstance().getCurrentSetupStep());
                         mySensorManager.resetAllTimer();
                     }
-                } else { //if the data is saved, that means this step is completed, then we wait until the user start moving to track again
+                } else {
+                    //if the data is saved, that means this step is completed,
+                    //then we wait until the user start moving the phone to track the next position again
                     mySensorManager.updateSensorManager(deltaTime);
                     if (mySensorManager.getVibrateTime() > 0) {
                         vibrator.vibrate(mySensorManager.getVibrateTime());
