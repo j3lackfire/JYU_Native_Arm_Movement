@@ -61,9 +61,19 @@ public class PositionManager {
             return new double[] {-1,-1,-1};
         }
         return new double[] {
-            savedPositions[currentTrackingPositionIndex].x,
-            savedPositions[currentTrackingPositionIndex].y,
-            savedPositions[currentTrackingPositionIndex].z };
+            roundNumber(cachedPosition.x),
+            roundNumber(cachedPosition.y),
+            roundNumber(cachedPosition.z)};
+    }
+
+    public double[] getSavedPosition() {
+        if (currentTrackingPositionIndex <  0) {
+            return new double[] {-1,-1,-1};
+        }
+        return new double[] {
+                roundNumber(savedPositions[currentTrackingPositionIndex].x),
+                roundNumber(savedPositions[currentTrackingPositionIndex].y),
+                roundNumber(savedPositions[currentTrackingPositionIndex].z) };
     }
 
     public double[] getCurrentVelocity() {
@@ -71,8 +81,13 @@ public class PositionManager {
             return new double[] {-1,-1,-1};
         }
         return new double[] {
-                currentVelocity.x,
-                currentVelocity.y,
-                currentVelocity.z };
+                roundNumber(currentVelocity.x),
+                roundNumber(currentVelocity.y),
+                roundNumber(currentVelocity.z)};
     }
+
+    private double roundNumber(double d) {
+        return Math.round(d * 100) / 100d;
+    }
+
 }

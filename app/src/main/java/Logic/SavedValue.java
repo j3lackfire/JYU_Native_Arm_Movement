@@ -20,9 +20,9 @@ public class SavedValue {
     public double posY;
     public double posZ;
 
-    public double veloX;
-    public double veloY;
-    public double veloZ;
+//    public double veloX;
+//    public double veloY;
+//    public double veloZ;
 
 //    public double acceX;
 //    public double acceY;
@@ -40,9 +40,9 @@ public class SavedValue {
         posY = -1;
         posZ = -1;
 
-        veloX = -1;
-        veloY = -1;
-        veloZ = -1;
+//        veloX = -1;
+//        veloY = -1;
+//        veloZ = -1;
 
 //        acceX = -1;
 //        acceY = -1;
@@ -63,11 +63,11 @@ public class SavedValue {
         posZ = z;
     }
 
-    public void setVelocity(double x, double y, double z) {
-        veloX = x;
-        veloY = y;
-        veloZ = z;
-    }
+//    public void setVelocity(double x, double y, double z) {
+//        veloX = x;
+//        veloY = y;
+//        veloZ = z;
+//    }
 
 //    public void setAcce(double x,double y, double z) {
 //        acceX = x;
