@@ -51,8 +51,8 @@ public class PositionManager {
             registerInitialPosition(currentTrackingPositionIndex);
         } else {
             savedPositions[currentTrackingPositionIndex] = cachedPosition;
-            currentVelocity = new Velocity(0,0,0);
-            cachedPosition = new Position(0,0,0);
+//            currentVelocity = new Velocity(0,0,0);
+//            cachedPosition = new Position(0,0,0);
         }
     }
 
