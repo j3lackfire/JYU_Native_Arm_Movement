@@ -65,4 +65,14 @@ public class PositionManager {
             savedPositions[currentTrackingPositionIndex].y,
             savedPositions[currentTrackingPositionIndex].z };
     }
+
+    public double[] getCurrentVelocity() {
+        if (currentTrackingPositionIndex < 0) {
+            return new double[] {-1,-1,-1};
+        }
+        return new double[] {
+                currentVelocity.x,
+                currentVelocity.y,
+                currentVelocity.z };
+    }
 }

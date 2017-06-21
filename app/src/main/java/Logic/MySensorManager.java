@@ -154,7 +154,9 @@ public class MySensorManager {
         savedValue.setTimeStamp(previousTime);
         double[] savedPos = PositionManager.getInstance().getCurrentPosition();
         savedValue.setPos(savedPos[0], savedPos[1], savedPos[2]);
-        savedValue.setAcce(cachedAccelerationData[0], cachedAccelerationData[1], cachedAccelerationData[2]);
+        double[] savedVelocity = PositionManager.getInstance().getCurrentVelocity();
+        savedValue.setVelocity(savedVelocity[0], savedVelocity[1], savedVelocity[2]);
+//        savedValue.setAcce(cachedAccelerationData[0], cachedAccelerationData[1], cachedAccelerationData[2]);
 //        savedValue.setGyro(cachedGyroData[0], cachedGyroData[1], cachedGyroData[2]);
         return savedValue.myGetJsonString();
     }
@@ -164,7 +166,9 @@ public class MySensorManager {
         savedValue.setTimeStamp(previousTime);
         double[] savedPos = PositionManager.getInstance().getCurrentPosition();
         savedValue.setPos(savedPos[0], savedPos[1], savedPos[2]);
-        savedValue.setAcce(cachedAccelerationData[0], cachedAccelerationData[1], cachedAccelerationData[2]);
+        double[] savedVelocity = PositionManager.getInstance().getCurrentVelocity();
+        savedValue.setVelocity(savedVelocity[0], savedVelocity[1], savedVelocity[2]);
+//        savedValue.setAcce(cachedAccelerationData[0], cachedAccelerationData[1], cachedAccelerationData[2]);
 //        savedValue.setGyro(cachedGyroData[0], cachedGyroData[1], cachedGyroData[2]);
         return savedValue.myGetJsonStringPretty();
     }
