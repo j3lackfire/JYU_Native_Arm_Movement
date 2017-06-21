@@ -16,9 +16,9 @@ import java.io.IOException;
 public class SavedValue {
     public long timeStamp;
 
-    public double posX;
-    public double posY;
-    public double posZ;
+    public double sideMovement;
+    public double frontBack;
+    public double upDown;
 
 //    public double veloX;
 //    public double veloY;
@@ -36,9 +36,9 @@ public class SavedValue {
     public SavedValue() {
         timeStamp = -1;
 
-        posX = -1;
-        posY = -1;
-        posZ = -1;
+        sideMovement = -1;
+        frontBack = -1;
+        upDown = -1;
 
 //        veloX = -1;
 //        veloY = -1;
@@ -58,9 +58,9 @@ public class SavedValue {
     }
 
     public void setPos(double x, double y,double z) {
-        posX = x;
-        posY = y;
-        posZ = z;
+        sideMovement = x;
+        frontBack = y;
+        upDown = z;
     }
 
 //    public void setVelocity(double x, double y, double z) {

@@ -31,7 +31,7 @@ public class PositionManager {
     }
 
     public void updatePosition(double acceX, double acceY, double acceZ, double deltaTime) {
-        if (currentTrackingPositionIndex == -1 || currentTrackingPositionIndex == 2) {
+        if (currentTrackingPositionIndex == -1) {
             return;
         }
         currentVelocity.add(Velocity.getVelocity(acceX,acceY,acceZ,deltaTime));
