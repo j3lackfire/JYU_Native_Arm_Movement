@@ -5,7 +5,9 @@ package Logic;
  */
 
 public class Velocity {
-    public double x,y,z;
+    public double x;
+    public double y;
+    public double z;
 
     public Velocity(double _x, double _y, double _z) {
         x = _x;

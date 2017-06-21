@@ -47,7 +47,7 @@ public class PositionManager {
 
     public void registerPosition() {
         currentTrackingPositionIndex++;
-        if (currentTrackingPositionIndex == 0 || currentTrackingPositionIndex == 3) {
+        if (currentTrackingPositionIndex == 0/* || currentTrackingPositionIndex == 3*/) {
             registerInitialPosition(currentTrackingPositionIndex);
         } else {
             savedPositions[currentTrackingPositionIndex] = cachedPosition;

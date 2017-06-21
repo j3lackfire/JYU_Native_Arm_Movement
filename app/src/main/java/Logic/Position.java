@@ -5,7 +5,9 @@ package Logic;
  */
 
 public class Position {
-    public double x,y,z;
+    public double x;
+    public double y;
+    public double z;
 
     public Position(double _x, double _y, double _z) {
         x = _x;

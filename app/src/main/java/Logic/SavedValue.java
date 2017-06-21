@@ -14,7 +14,7 @@ import java.io.IOException;
  */
 
 public class SavedValue {
-    public long timeStamp;
+    public long _timeStamp;
 
     public double sideMovement;
     public double frontBack;
@@ -34,7 +34,7 @@ public class SavedValue {
 
     //constructor with default value
     public SavedValue() {
-        timeStamp = -1;
+        _timeStamp = -1;
 
         sideMovement = -1;
         frontBack = -1;
@@ -54,7 +54,7 @@ public class SavedValue {
     }
 
     public void setTimeStamp(long _time) {
-        timeStamp = _time;
+        _timeStamp = _time;
     }
 
     public void setPos(double x, double y,double z) {
