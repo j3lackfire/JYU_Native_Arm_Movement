@@ -95,6 +95,7 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
     private void saveUserPositionData() {
         String setupKey = SetupLogic.getInstance().getCurrentSetupKey();
         isDataSaved = true;
+        mySensorManager.prepareDataToSave(currentTime);
         PositionManager.getInstance().registerPosition();
         if (setupKey.equals("Invalid")) {
             //throw some exception or something here
