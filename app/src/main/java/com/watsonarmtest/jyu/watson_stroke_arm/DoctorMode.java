@@ -100,7 +100,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
     }
 
     private void playNextStepAudio() {
-        MediaPlayer nextStep = MediaPlayer.create(DoctorMode.this,R.raw.next_step);
+        MediaPlayer nextStep = MediaPlayer.create(DoctorMode.this,R.raw.finish);
         nextStep.start();
     }
 
