@@ -26,7 +26,11 @@ public class Position {
     public static Position getPositionFromAcceleration(double acceX, double acceY, double acceZ, long deltaTime) {
 //        double deltaTimeSquare = (deltaTime / 1000d) * (deltaTime / 1000d);
 //        return new Position(acceX * deltaTimeSquare, acceY * deltaTimeSquare, acceZ * deltaTimeSquare);
-        return new Position(acceX * deltaTime, acceY * deltaTime, acceZ * deltaTime);
+        double x1 = acceX * deltaTime *deltaTime;
+        double y1 = acceY * deltaTime *deltaTime;
+        double z1 = acceZ * deltaTime *deltaTime;
+        Log.i(SetupMode.TAG, "Delta time: " + deltaTime + " - Added pos : " + x1 + ", " + y1 + ", " + z1);
+        return new Position(acceX * deltaTime * deltaTime, acceY * deltaTime * deltaTime, acceZ * deltaTime * deltaTime);
     }
 
     public void add(Position p) {
@@ -40,5 +44,6 @@ public class Position {
         x += p.x /million;
         y += p.y /million;
         z += p.z /million;
+        Log.i(SetupMode.TAG, "Current pos : " + x + ", " + y + ", " + z);
     }
 }

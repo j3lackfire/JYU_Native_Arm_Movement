@@ -60,9 +60,9 @@ public class MySensorManager {
     //The class calling this must implement SensorEventListener interface
     //called on OnResume
     public void registerSensors(SensorEventListener listener) {
-        sensorManager.registerListener(listener, sensorManager.getDefaultSensor(accelerationSensorType), SensorManager.SENSOR_DELAY_FASTEST);
-        sensorManager.registerListener(listener, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_FASTEST);
-        sensorManager.registerListener(listener, sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(listener, sensorManager.getDefaultSensor(accelerationSensorType), SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(listener, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(listener, sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     //called on on pause
@@ -79,8 +79,12 @@ public class MySensorManager {
                 cachedAccelerationData[i] = event.values[i];
             }
 
-            long deltaTime = time - previouslyChangedAccelerationTime;
-            previouslyChangedAccelerationTime = time;
+            if (previouslyChangedAccelerationTime == -1) {
+                previouslyChangedAccelerationTime = event.timestamp;
+            }
+            long deltaTime = event.timestamp - previouslyChangedAccelerationTime;
+            previouslyChangedAccelerationTime = event.timestamp;
+            deltaTime = deltaTime / 1000000;
             PositionManager.getInstance().updatePosition(
                     cachedAccelerationData[0],
                     cachedAccelerationData[1],
@@ -102,9 +106,9 @@ public class MySensorManager {
     }
 
     public void prepareDataToSave(long currentTime) {
-        long deltaTime = currentTime - previouslyChangedAccelerationTime;
-        previouslyChangedAccelerationTime = currentTime;
-        PositionManager.getInstance().updatePosition(0,0,0,deltaTime);
+        //long deltaTime = currentTime - previouslyChangedAccelerationTime;
+        //previouslyChangedAccelerationTime = currentTime;
+        //PositionManager.getInstance().updatePosition(0,0,0,deltaTime);
     }
 
     public void updateSensorManager(long deltaTime) {
