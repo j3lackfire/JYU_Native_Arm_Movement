@@ -142,7 +142,7 @@ public class MySensorManager {
 
     public boolean isSignificantMovementDetected() {
         for (int i = 0; i < 3; i ++) {
-            if (cachedAccelerationData[i] > maximumDeltaAcceleration) {
+            if (Math.abs(cachedAccelerationData[i]) > maximumDeltaAcceleration) {
                 return true;
             }
         }
@@ -151,7 +151,7 @@ public class MySensorManager {
             double delta = (savedGyroData[i] - cachedGyroData[i]) * (savedGyroData[i] - cachedGyroData[i]);
             deltaGyro += delta;
         }
-        deltaGyro = Math.sqrt(deltaGyro);
+        deltaGyro = Math.sqrt(Math.abs(deltaGyro));
         if (deltaGyro >= maximumDeltaGyro) {
             return true;
         }

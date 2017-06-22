@@ -15,8 +15,13 @@ public class Position {
         z = _z;
     }
 
-    public static Position getPosition(double veloX, double veloY, double veloZ, double deltaTime) {
+    public static Position getPosition(double veloX, double veloY, double veloZ, long deltaTime) {
         return new Position(veloX * deltaTime / 1000, veloY * deltaTime / 1000, veloZ * deltaTime / 1000);
+    }
+
+    public static Position getPositionFromAcceleration(double acceX, double acceY, double acceZ, long time) {
+        long deltaTimeSquare = (time / 1000) ^ 2;
+        return new Position(acceX * deltaTimeSquare, acceY * deltaTimeSquare, acceZ * deltaTimeSquare);
     }
 
     public void add(Position p) {

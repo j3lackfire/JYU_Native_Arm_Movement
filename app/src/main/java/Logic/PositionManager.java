@@ -36,14 +36,15 @@ public class PositionManager {
         cachedPosition = new Position(-1,-1,-1);
     }
 
-    public void updatePosition(double acceX, double acceY, double acceZ, double deltaTime) {
+    public void updatePosition(double acceX, double acceY, double acceZ, long deltaTime) {
         if (currentTrackingPositionIndex < 0) {
             return;
         }
         //velocity = acceleration * deltaTime
-        currentVelocity.add(Velocity.getVelocity(acceX,acceY,acceZ,deltaTime));
+//        currentVelocity.add(Velocity.getVelocity(acceX,acceY,acceZ,deltaTime));
         //position = velocity * deltaTime
-        cachedPosition.add(Position.getPosition(currentVelocity.x, currentVelocity.y, currentVelocity.z, deltaTime));
+//        cachedPosition.add(Position.getPosition(currentVelocity.x, currentVelocity.y, currentVelocity.z, deltaTime));
+        cachedPosition.add(Position.getPositionFromAcceleration(acceX, acceY, acceZ, deltaTime));
     }
 
     //For right down and left down.
