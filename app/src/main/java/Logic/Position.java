@@ -24,14 +24,21 @@ public class Position {
     }
 
     public static Position getPositionFromAcceleration(double acceX, double acceY, double acceZ, long deltaTime) {
-        double deltaTimeSquare = (deltaTime / 1000d) * (deltaTime / 1000d);
-        Log.v(SetupMode.TAG, "Delta time square: " + deltaTimeSquare);
-        return new Position(acceX * deltaTimeSquare, acceY * deltaTimeSquare, acceZ * deltaTimeSquare);
+//        double deltaTimeSquare = (deltaTime / 1000d) * (deltaTime / 1000d);
+//        return new Position(acceX * deltaTimeSquare, acceY * deltaTimeSquare, acceZ * deltaTimeSquare);
+        return new Position(acceX * deltaTime, acceY * deltaTime, acceZ * deltaTime);
     }
 
     public void add(Position p) {
         x += p.x;
         y += p.y;
         z += p.z;
+    }
+
+    public void addAndDivideByMillions(Position p) {
+        long million = 1000000;
+        x += p.x /million;
+        y += p.y /million;
+        z += p.z /million;
     }
 }

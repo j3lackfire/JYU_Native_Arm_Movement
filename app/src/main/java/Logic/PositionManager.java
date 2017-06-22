@@ -44,7 +44,7 @@ public class PositionManager {
 //        currentVelocity.add(Velocity.getVelocity(acceX,acceY,acceZ,deltaTime));
         //position = velocity * deltaTime
 //        cachedPosition.add(Position.getPosition(currentVelocity.x, currentVelocity.y, currentVelocity.z, deltaTime));
-        cachedPosition.add(Position.getPositionFromAcceleration(acceX, acceY, acceZ, deltaTime));
+        cachedPosition.addAndDivideByMillions(Position.getPositionFromAcceleration(acceX, acceY, acceZ, deltaTime));
     }
 
     //For right down and left down.
