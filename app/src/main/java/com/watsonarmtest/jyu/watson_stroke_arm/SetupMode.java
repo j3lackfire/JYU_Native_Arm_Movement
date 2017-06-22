@@ -24,6 +24,7 @@ import Logic.SetupLogic;
 import Logic.SetupStep;
 
 public class SetupMode extends AppCompatActivity implements SensorEventListener {
+    public static final String TAG = "MyActicity";
 
     Button buttonStartSetup;
 

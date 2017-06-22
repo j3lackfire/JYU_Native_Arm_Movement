@@ -1,5 +1,9 @@
 package Logic;
 
+import android.util.Log;
+
+import com.watsonarmtest.jyu.watson_stroke_arm.SetupMode;
+
 /**
  * Created by Le Pham Minh Duc on 6/19/2017.
  */
@@ -19,8 +23,9 @@ public class Position {
         return new Position(veloX * deltaTime / 1000, veloY * deltaTime / 1000, veloZ * deltaTime / 1000);
     }
 
-    public static Position getPositionFromAcceleration(double acceX, double acceY, double acceZ, long time) {
-        long deltaTimeSquare = (time / 1000) ^ 2;
+    public static Position getPositionFromAcceleration(double acceX, double acceY, double acceZ, long deltaTime) {
+        double deltaTimeSquare = (deltaTime / 1000d) * (deltaTime / 1000d);
+        Log.v(SetupMode.TAG, "Delta time square: " + deltaTimeSquare);
         return new Position(acceX * deltaTimeSquare, acceY * deltaTimeSquare, acceZ * deltaTimeSquare);
     }
 
