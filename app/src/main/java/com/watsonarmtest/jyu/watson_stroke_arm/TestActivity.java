@@ -14,15 +14,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import Logic.SetupLogic;
 
 public class TestActivity extends AppCompatActivity implements SensorEventListener {
     //sensor stuffs
     SensorManager sensorManager;
     Sensor linearAccelerationSensor;
-    private long initialTimeStamp = -1;
+    private long startRecordingTime = -1;
     private long previousTimeStamp = -1;
 
     //email stuffs
@@ -31,6 +30,7 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
 
     private Button buttonRecording;
     private String accelerationData = "";
+    private TextView dataText;
     private boolean isRecordingData = false;
 
     @Override
@@ -41,7 +41,7 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
         //sensors
         sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         linearAccelerationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        initialTimeStamp = -1;
+        startRecordingTime = -1;
         previousTimeStamp = -1;
 
         //buttons
@@ -61,6 +61,8 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
+        dataText = (TextView)findViewById(R.id.acceleration_data_text);
+
         loadUserEmail();
         isRecordingData = false;
     }
@@ -77,7 +79,9 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
         isRecordingData = true;
         buttonRecording.setText("Stop recording");
         //clear all of the acceleration data
+        startRecordingTime = -1;
         accelerationData = "Time,x,y,z";
+        dataText.setText(accelerationData);
     }
 
     private void stopRecording() {
@@ -101,15 +105,17 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
 
     @Override //import tant function
     public void onSensorChanged(SensorEvent event) {
-        if (initialTimeStamp == -1) {
-            initialTimeStamp = event.timestamp;
+        if (startRecordingTime == -1) {
+            startRecordingTime = event.timestamp;
             previousTimeStamp = event.timestamp;
         }
         long deltaTime = event.timestamp - previousTimeStamp;
         previousTimeStamp = event.timestamp;
 
         if (isRecordingData) {
-            accelerationData += "\n" + getDataInCSVFormat(previousTimeStamp, event.values);
+            accelerationData += "\n" + getDataInCSVFormat(previousTimeStamp - startRecordingTime, event.values);
+            //displaying
+            dataText.setText(dataText.getText().toString() + "\n" + getDataCSVShort(previousTimeStamp - startRecordingTime, event.values));
         }
     }
 
@@ -117,6 +123,16 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
         long oneMillion = 1000000;
         long timeStampMili = timeStampNano / oneMillion;
         return timeStampMili + "," + values[0] + "," + values[1] + "," + values[2];
+    }
+
+    private String getDataCSVShort(long timeStampNano, float[] values) {
+        long oneMillion = 1000000;
+        long timeStampMili = timeStampNano / oneMillion;
+        return timeStampMili + "," + roundNumber(values[0]) + "," + roundNumber(values[1]) + "," + roundNumber(values[2]);
+    }
+
+    private double roundNumber(double d) {
+        return Math.round(d * 100) / 100d;
     }
 
     @Override
