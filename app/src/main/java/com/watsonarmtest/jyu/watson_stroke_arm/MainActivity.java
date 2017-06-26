@@ -12,17 +12,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
 
         //Go to set up mode
         Button setupModeButton = (Button) findViewById(R.id.button_setup_mode);
@@ -41,6 +30,16 @@ public class MainActivity extends AppCompatActivity {
                 enterDoctorMode();
             }
         });
+
+        //go to test mode
+        Button testModeButton = (Button) findViewById(R.id.button_enter_test_mode);
+        testModeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                enterTestMode();
+            }
+        });
+
     }
 
     private void enterSetupMode() {
@@ -51,6 +50,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void enterDoctorMode() {
         Intent intent = new Intent(this, DoctorMode.class);
+        startActivity(intent);
+    }
+
+    private void enterTestMode() {
+        Intent intent = new Intent(this, TestActivity.class);
         startActivity(intent);
     }
 }

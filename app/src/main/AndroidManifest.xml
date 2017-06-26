@@ -23,6 +23,7 @@
         </activity>
         <activity android:name=".SetupMode" />
         <activity android:name=".DoctorMode" />
+        <activity android:name=".TestActivity"></activity>
     </application>
 
 </manifest>

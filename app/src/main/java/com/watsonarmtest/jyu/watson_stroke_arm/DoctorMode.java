@@ -99,18 +99,6 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
 //        String reportText = sharedPreferences.getString(userSavedKey, "NOT EXISTED");
     }
 
-    public void sendEmailTo(String destination, String title, String content) {
-        Intent i = new Intent(Intent.ACTION_SEND);
-        i.setType("message/rfc822");
-        i.putExtra(Intent.EXTRA_EMAIL, new String[]{destination});
-        i.putExtra(Intent.EXTRA_SUBJECT, title);
-        i.putExtra(Intent.EXTRA_TEXT, content);
-        try {
-            startActivity(Intent.createChooser(i, "Send mail..."));
-        } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(DoctorMode.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     //sensor stuffs
     @Override
