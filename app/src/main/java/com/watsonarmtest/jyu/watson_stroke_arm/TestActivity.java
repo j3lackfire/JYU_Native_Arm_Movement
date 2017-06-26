@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,10 +14,13 @@ import android.widget.Toast;
 public class TestActivity extends AppCompatActivity {
 
     private String defaultEmail = "j3lackfire@gmail.com";
-    private Button buttonRecording;
-    private String accelerationData = "";
 
     private String savedEmailKey = "SAVED_USER_EMAIL";
+
+    private Button buttonRecording;
+    private String accelerationData = "";
+    private boolean isRecordingData = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,18 +42,23 @@ public class TestActivity extends AppCompatActivity {
             }
         });
 
-        String savedUserEmail = "";
+        String savedUserEmail;
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        savedUserEmail = sharedPref.getString(savedUserEmail, "");
+        savedUserEmail = sharedPref.getString(savedEmailKey, "");
         if (!savedUserEmail.equals("")) {
             EditText emailText = (EditText) findViewById(R.id.edit_text_email);
             emailText.setText(savedUserEmail);
         }
-        accelerationData = "Hello, this is a test email !";
+
+        isRecordingData = false;
     }
 
     public void onRecordingButtonPressed() {
+        if (isRecordingData) {
 
+        } else {
+
+        }
     }
 
 
@@ -83,6 +92,7 @@ public class TestActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(savedEmailKey, email);
         editor.commit();
+        Log.v(SetupMode.TAG, "User email is saved: " + email);
     }
 
 }
