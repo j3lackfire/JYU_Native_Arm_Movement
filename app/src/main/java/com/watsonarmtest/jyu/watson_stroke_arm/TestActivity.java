@@ -1,6 +1,8 @@
 package com.watsonarmtest.jyu.watson_stroke_arm;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -13,6 +15,8 @@ public class TestActivity extends AppCompatActivity {
     private String defaultEmail = "j3lackfire@gmail.com";
     private Button buttonRecording;
     private String accelerationData = "";
+
+    private String savedEmailKey = "SAVED_USER_EMAIL";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +37,14 @@ public class TestActivity extends AppCompatActivity {
                 sendDataByEmail();
             }
         });
+
+        String savedUserEmail = "";
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        savedUserEmail = sharedPref.getString(savedUserEmail, "");
+        if (!savedUserEmail.equals("")) {
+            EditText emailText = (EditText) findViewById(R.id.edit_text_email);
+            emailText.setText(savedUserEmail);
+        }
         accelerationData = "Hello, this is a test email !";
     }
 
@@ -46,11 +58,14 @@ public class TestActivity extends AppCompatActivity {
         String email = emailText.getText().toString();
         if (email.equals("")) {
             email = defaultEmail;
+        } else {
+            //save the email so we don't have to type it again later.
+            saveUserEmail(email);
         }
         sendEmailTo(email,"Acceleration data",accelerationData);
     }
 
-    public void sendEmailTo(String email, String title, String content) {
+    private void sendEmailTo(String email, String title, String content) {
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setType("message/rfc822");
         i.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
@@ -61,6 +76,13 @@ public class TestActivity extends AppCompatActivity {
         } catch (android.content.ActivityNotFoundException ex) {
             Toast.makeText(TestActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void saveUserEmail(String email) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(savedEmailKey, email);
+        editor.commit();
     }
 
 }
