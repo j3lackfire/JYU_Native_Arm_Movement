@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.widget.Toast;
 
 import Logic.MySensorManager;
 
@@ -93,15 +94,22 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         editor.putString(savedSensorDataKey, savedString);
         editor.commit();
 
-        playNextStepAudio();
         //Use this to read data from the shared preferences
 //        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 //        String reportText = sharedPreferences.getString(userSavedKey, "NOT EXISTED");
     }
 
-    private void playNextStepAudio() {
-        MediaPlayer nextStep = MediaPlayer.create(DoctorMode.this,R.raw.finish);
-        nextStep.start();
+    public void sendEmailTo(String destination, String title, String content) {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("message/rfc822");
+        i.putExtra(Intent.EXTRA_EMAIL, new String[]{destination});
+        i.putExtra(Intent.EXTRA_SUBJECT, title);
+        i.putExtra(Intent.EXTRA_TEXT, content);
+        try {
+            startActivity(Intent.createChooser(i, "Send mail..."));
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(DoctorMode.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     //sensor stuffs
