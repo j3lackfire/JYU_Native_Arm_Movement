@@ -21,7 +21,7 @@ public class PositionManager {
     //the current moving velocity of the user
     private Velocity currentVelocity = new Velocity(0,0,0);
     //the current calculated position of the user's phone in world's space
-    private Position cachedPosition = new Position(-1,-1,-1);
+    private Position currentPosition = new Position(-1,-1,-1);
     //Array of all the stored position of the users
     private Position[] savedPositions = new Position[6];
     //which step of the setup mode the user is at
@@ -33,7 +33,7 @@ public class PositionManager {
         currentTrackingPositionIndex = -1;
         savedPositions = new Position[6];
         currentVelocity = new Velocity(-1,-1,-1);
-        cachedPosition = new Position(-1,-1,-1);
+        currentPosition = new Position(-1,-1,-1);
     }
 
     public void updatePosition(double acceX, double acceY, double acceZ, long deltaTime) {
@@ -42,19 +42,17 @@ public class PositionManager {
         }
 
         double[] vels = new double[] {currentVelocity.x, currentVelocity.y, currentVelocity.z};
-        cachedPosition.add(Position.calculatePosition(deltaTime, vels, new double[] {acceX, acceY, acceZ}));
+        //distance traveled = s0 + v0 * t + a * t * t / 2
+        currentPosition.add(Position.calculatePosition(deltaTime, vels, new double[] {acceX, acceY, acceZ}));
         //velocity = acceleration * deltaTime
         currentVelocity.add(Velocity.getVelocity(acceX,acceY,acceZ,deltaTime));
-        //position = velocity * deltaTime
-//        cachedPosition.add(Position.getPosition(currentVelocity.x, currentVelocity.y, currentVelocity.z, deltaTime));
-
     }
 
     //For right down and left down.
     private void registerInitialPosition(int index) {
         savedPositions[index] = new Position(0,0,0);
         currentVelocity = new Velocity(0,0,0);
-        cachedPosition = new Position(0,0,0);
+        currentPosition = new Position(0,0,0);
     }
 
     public void registerPosition() {
@@ -62,9 +60,8 @@ public class PositionManager {
         if (currentTrackingPositionIndex == 0 || currentTrackingPositionIndex == 3) {
             registerInitialPosition(currentTrackingPositionIndex);
         } else {
-            savedPositions[currentTrackingPositionIndex] = cachedPosition;
+            savedPositions[currentTrackingPositionIndex] = new Position(currentPosition.x,currentPosition.y,currentPosition.z);
             currentVelocity = new Velocity(0,0,0);
-//            cachedPosition = new Position(0,0,0);
         }
     }
 
@@ -74,9 +71,9 @@ public class PositionManager {
             return new double[] {-1,-1,-1};
         }
         return new double[] {
-            roundNumber(cachedPosition.x),
-            roundNumber(cachedPosition.y),
-            roundNumber(cachedPosition.z)};
+            roundNumber(currentPosition.x),
+            roundNumber(currentPosition.y),
+            roundNumber(currentPosition.z)};
     }
 
     //the position that is actually saved to the hardware.
