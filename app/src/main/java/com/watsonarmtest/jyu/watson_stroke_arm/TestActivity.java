@@ -34,6 +34,9 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
     private ArrayList<Float> averageAcceY;
     private ArrayList<Float> averageAcceZ;
 
+    private double[] previousVelocity = new double[]{0,0,0};
+    private double[] previousPosition = new double[]{0,0,0};
+
     //email stuffs
     private String defaultEmail = "j3lackfire@gmail.com";
     private String savedEmailKey = "SAVED_USER_EMAIL";
@@ -93,7 +96,7 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
         buttonRecording.setText("Stop recording");
         //clear all of the acceleration data
         startRecordingTime = -1;
-        accelerationData = "Time,x,y,z,zVelocity,zPos\n0,0,0,0,0,0";
+        accelerationData = "Time,x,y,z,Vx,Vy,Vz,Px,Py,Pz,a,b\n0,0,0,0,0,0,0,0,0,0,0,0";
         dataText.setText(accelerationData);
         resetCachedValueData();
     }
@@ -134,13 +137,45 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
 
             addCacheValueData(event.values);
             if (cachedDeltaTime >= minimumRefreshRate) {
-                accelerationData += "\n" + getDataInCSVFormat(previousTimeStamp - startRecordingTime, getAverageData());
+                accelerationData += "\n" + getDataInCSVFormat(previousTimeStamp - startRecordingTime, getAverageAccelerationData());
+                //calculate the velocity and position
+                double[] deltaPos = calculateDeltaPosition(previousVelocity, getAverageAccelerationData(), cachedDeltaTime);
+                double[] deltaVel = calculateDeltaVelocity(getAverageAccelerationData(), cachedDeltaTime);
+                for (int i = 0; i < 3; i ++) {
+                    previousPosition[i] = previousPosition[i] + deltaPos[i];
+                    previousVelocity[i] = previousVelocity[i] + deltaVel[i];
+                }
+                accelerationData +=
+                        previousPosition[0] + "," +
+                        previousVelocity[1] + "," +
+                        previousVelocity[2] + "," +
+                        previousPosition[0] + "," +
+                        previousPosition[1] + "," +
+                        previousPosition[2] + ",";
                 //displaying
-                dataText.setText(dataText.getText().toString() + "\n" + getDataCSVShort(previousTimeStamp - startRecordingTime, getAverageData()));
+                dataText.setText(dataText.getText().toString() + "\n" + getDataCSVShort(previousTimeStamp - startRecordingTime, getAverageAccelerationData()));
 
                 resetCachedValueData();
             }
         }
+    }
+
+    private double[] calculateDeltaVelocity(float[] acceleration, long deltaTimeMili) {
+        double[] returnDoubles = new double[]{0,0,0};
+        double deltaTime = deltaTimeMili / 1000;
+        for (int i = 0; i < returnDoubles.length; i ++) {
+            returnDoubles[i] = acceleration[i] * deltaTime;
+        }
+        return returnDoubles;
+    }
+
+    private double[] calculateDeltaPosition(double[] vel, float[] acce, long deltaTimeMili ) {
+        double[] returnDoubles = new double[] {0,0,0};
+        double deltaTime = deltaTimeMili / 1000;
+        for (int i = 0; i < returnDoubles.length; i ++) {
+            returnDoubles[i] = vel[i] * deltaTime + acce[i] * deltaTime * deltaTime / 2;
+        }
+        return returnDoubles;
     }
 
     private void addCacheValueData(float[] acceData) {
@@ -149,7 +184,7 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
         averageAcceZ.add(acceData[2]);
     }
 
-    private float[] getAverageData() {
+    private float[] getAverageAccelerationData() {
         float averageX = 0;
         float averageY = 0;
         float averageZ = 0;

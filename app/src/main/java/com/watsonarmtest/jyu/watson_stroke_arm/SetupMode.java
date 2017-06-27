@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import Logic.MySensorManager;
+import Logic.Position;
 import Logic.PositionManager;
 import Logic.SetupLogic;
 import Logic.SetupStep;
@@ -91,6 +92,7 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
     private void goToMainPage() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        PositionManager.getInstance().reInit();
     }
 
     private void saveUserPositionData() {
@@ -148,8 +150,8 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
             "\nRight hand front: " + sharedPref.getString(SetupLogic.getInstance().getSetupKey(SetupStep.Right_Hand_Front), "-") +
             "\nRight hand up: " + sharedPref.getString(SetupLogic.getInstance().getSetupKey(SetupStep.Right_Hand_Up), "-") +
             "\nLeft hand down: " + sharedPref.getString(SetupLogic.getInstance().getSetupKey(SetupStep.Left_Hand_Down), "-") +
-            "\nLeft hand front: " + sharedPref.getString(SetupLogic.getInstance().getSetupKey(SetupStep.Left_Hand_Down), "-") +
-            "\nLeft hand up: " + sharedPref.getString(SetupLogic.getInstance().getSetupKey(SetupStep.Left_Hand_Down), "-");
+            "\nLeft hand front: " + sharedPref.getString(SetupLogic.getInstance().getSetupKey(SetupStep.Left_Hand_Front), "-") +
+            "\nLeft hand up: " + sharedPref.getString(SetupLogic.getInstance().getSetupKey(SetupStep.Left_Hand_Up), "-");
     }
 
     //audio stuffs

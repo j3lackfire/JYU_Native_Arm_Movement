@@ -36,6 +36,10 @@ public class PositionManager {
         currentPosition = new Position(-1,-1,-1);
     }
 
+    public void reInit() {
+        instance = new PositionManager();
+    }
+
     public void updatePosition(double acceX, double acceY, double acceZ, long deltaTime) {
         if (currentTrackingPositionIndex < 0) {
             return;
