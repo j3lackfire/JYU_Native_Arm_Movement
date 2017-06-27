@@ -5,6 +5,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+import java.util.ArrayList;
+
 /**
  * Created by Le Pham Minh Duc on 6/13/2017.
  */
@@ -12,10 +14,10 @@ import android.hardware.SensorManager;
 public class MySensorManager {
     private int accelerationSensorType;
 
-    public SensorManager sensorManager;
-    public Sensor acceSensor;
-    public Sensor gyroSensor;
-    public Sensor rotationSensor;
+    private SensorManager sensorManager;
+    private Sensor acceSensor;
+    private Sensor gyroSensor;
+    private Sensor rotationSensor;
 
     private long previousTime = -1;
     /*
@@ -28,20 +30,26 @@ public class MySensorManager {
     private long previouslyChangedAccelerationTime = -1;
     private double[] cachedGyroData = {-1,-1,-1};
     private double[] cachedRotationData = {-1,-1,-1,-1};
+
+    private long positionTimer = 0; //cached value, don't worry about it.
+    private long cachedDeltaTime = -1;
+    private long stationaryTimer = 0; //cached value, don't worry about it.
+    private ArrayList<Float> averageAcceX;
+    private ArrayList<Float> averageAcceY;
+    private ArrayList<Float> averageAcceZ;
     /*
     Configuration data for the sensor recording step
     */
     private long refreshTimeMili = 50; //50 mili seconds - 0.05 seconds
-    private long positionTimer = 0; //cached value, don't worry about it.
+    private long minimumRefreshRate = 200; //200 miliseconds
 
-    private long stationaryTimer = 0; //cached value, don't worry about it.
     private long maxStationaryTime = 2000; //milliseconds, 2000 is 2 second
 
     //if the current value goes beyond this value, mark as the phone is still moving.
     private double maximumDeltaAcceleration = 0.5;
     private double maximumDeltaGyro = 1;
 
-//    private double[] savedAccelerationData = {-1,-1,-1};
+    //    private double[] savedAccelerationData = {-1,-1,-1};
     private double[] savedGyroData = {-1,-1,-1};
 
     private boolean shouldVibratePhone = false;
@@ -74,22 +82,33 @@ public class MySensorManager {
     //this function should be called several time per second
     public void onSensorChanged(SensorEvent event, long time) {
         previousTime = time;
+        long timeStampMili = event.timestamp / 1000000;
+
         if (event.sensor.getType() == accelerationSensorType) { //sensor event type is accelerometer
             for (int i = 0; i < 3; i++) {
                 cachedAccelerationData[i] = event.values[i];
             }
 
             if (previouslyChangedAccelerationTime == -1) {
-                previouslyChangedAccelerationTime = event.timestamp;
+                previouslyChangedAccelerationTime = timeStampMili;
             }
-            long deltaTime = event.timestamp - previouslyChangedAccelerationTime;
-            previouslyChangedAccelerationTime = event.timestamp;
-            deltaTime = deltaTime / 1000000;
-            PositionManager.getInstance().updatePosition(
-                    cachedAccelerationData[0],
-                    cachedAccelerationData[1],
-                    cachedAccelerationData[2],
-                    deltaTime);
+            long deltaTime = timeStampMili - previouslyChangedAccelerationTime;
+            previouslyChangedAccelerationTime = timeStampMili;
+            if (cachedDeltaTime <= 0) {
+                cachedDeltaTime = deltaTime;
+            } else {
+                cachedDeltaTime += deltaTime;
+            }
+            addCacheValueData(event.values);
+            if (cachedDeltaTime >= minimumRefreshRate) {
+                float[] averageData = getAverageData();
+                PositionManager.getInstance().updatePosition(
+                        averageData[0],
+                        averageData[1],
+                        averageData[2],
+                        deltaTime);
+                resetCachedValueData();
+            }
         } else {
             if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
                 for (int i = 0; i < 4; i++) {
@@ -105,20 +124,37 @@ public class MySensorManager {
         roundNumber();
     }
 
-    public void prepareDataToSave(long currentTime) {
-        //long deltaTime = currentTime - previouslyChangedAccelerationTime;
-        //previouslyChangedAccelerationTime = currentTime;
-        //PositionManager.getInstance().updatePosition(0,0,0,deltaTime);
+    private void addCacheValueData(float[] acceData) {
+        averageAcceX.add(acceData[0]);
+        averageAcceY.add(acceData[1]);
+        averageAcceZ.add(acceData[2]);
+    }
+
+    private float[] getAverageData() {
+        float averageX = 0;
+        float averageY = 0;
+        float averageZ = 0;
+        for (int i = 0; i < averageAcceX.size(); i ++) {
+            averageX += averageAcceX.get(i);
+            averageY += averageAcceY.get(i);
+            averageZ += averageAcceZ.get(i);
+        }
+        averageX /= averageAcceX.size();
+        averageY /= averageAcceX.size();
+        averageZ /= averageAcceX.size();
+        return new float[] {averageX, averageY, averageZ};
+    }
+
+    private void resetCachedValueData() {
+        averageAcceX.clear();
+        averageAcceY.clear();
+        averageAcceZ.clear();
+        cachedDeltaTime = -1;
     }
 
     public void updateSensorManager(long deltaTime) {
         positionTimer += deltaTime;
         stationaryTimer += deltaTime;
-//        PositionManager.getInstance().updatePosition(
-//                cachedAccelerationData[0],
-//                cachedAccelerationData[1],
-//                cachedAccelerationData[2],
-//                deltaTime);
         if (positionTimer >= refreshTimeMili) {
             //check if there are significant movement
             if (isSignificantMovementDetected()) {
@@ -144,7 +180,7 @@ public class MySensorManager {
 
     public long getVibrateTime() { return shouldVibratePhone ? refreshTimeMili * 2 : -1; }
 
-    public boolean isSignificantMovementDetected() {
+    private boolean isSignificantMovementDetected() {
         for (int i = 0; i < 3; i ++) {
             if (Math.abs(cachedAccelerationData[i]) > maximumDeltaAcceleration) {
                 return true;
@@ -175,10 +211,6 @@ public class MySensorManager {
         savedValue.setTimeStamp(previousTime);
         double[] savedPos = PositionManager.getInstance().getSavedPosition();
         savedValue.setPos(savedPos[0], savedPos[1], savedPos[2]);
-//        double[] savedVelocity = PositionManager.getInstance().getCurrentVelocity();
-//        savedValue.setVelocity(savedVelocity[0], savedVelocity[1], savedVelocity[2]);
-//        savedValue.setAcce(cachedAccelerationData[0], cachedAccelerationData[1], cachedAccelerationData[2]);
-//        savedValue.setGyro(cachedGyroData[0], cachedGyroData[1], cachedGyroData[2]);
         return savedValue.myGetJsonString();
     }
 
@@ -187,10 +219,6 @@ public class MySensorManager {
         savedValue.setTimeStamp(previousTime);
         double[] savedPos = PositionManager.getInstance().getCurrentPosition();
         savedValue.setPos(savedPos[0], savedPos[1], savedPos[2]);
-//        double[] savedVelocity = PositionManager.getInstance().getCurrentVelocity();
-//        savedValue.setVelocity(savedVelocity[0], savedVelocity[1], savedVelocity[2]);
-//        savedValue.setAcce(cachedAccelerationData[0], cachedAccelerationData[1], cachedAccelerationData[2]);
-//        savedValue.setGyro(cachedGyroData[0], cachedGyroData[1], cachedGyroData[2]);
         return savedValue.myGetJsonStringPretty();
     }
 

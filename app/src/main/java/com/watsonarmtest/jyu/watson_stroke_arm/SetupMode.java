@@ -51,7 +51,7 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
         startTime = SystemClock.uptimeMillis();
         handler.postDelayed(runnable, 0);
 
-        //sensor and stuff
+        //sensor
         mySensorManager = new MySensorManager((SensorManager)getSystemService(Context.SENSOR_SERVICE));
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
@@ -96,11 +96,11 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
     private void saveUserPositionData() {
         String setupKey = SetupLogic.getInstance().getCurrentSetupKey();
         isDataSaved = true;
-        mySensorManager.prepareDataToSave(currentTime);
         PositionManager.getInstance().registerPosition();
         if (setupKey.equals("Invalid")) {
             //throw some exception or something here
         } else {
+            //save the data to the hard drive
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(setupKey, mySensorManager.getSensorDataJSON());
@@ -139,6 +139,7 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
         }
     }
 
+    //to display all of the saved position data
     private String getAllSavedPositionData() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 

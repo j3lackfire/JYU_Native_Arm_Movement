@@ -19,7 +19,7 @@ public class PositionManager {
     Right: down, front, up - Left: down front up.
     */
     //the current moving velocity of the user
-    private Velocity currentVelocity = new Velocity(-1,-1,-1);
+    private Velocity currentVelocity = new Velocity(0,0,0);
     //the current calculated position of the user's phone in world's space
     private Position cachedPosition = new Position(-1,-1,-1);
     //Array of all the stored position of the users
@@ -40,11 +40,14 @@ public class PositionManager {
         if (currentTrackingPositionIndex < 0) {
             return;
         }
+
+        double[] vels = new double[] {currentVelocity.x, currentVelocity.y, currentVelocity.z};
+        cachedPosition.add(Position.calculatePosition(deltaTime, vels, new double[] {acceX, acceY, acceZ}));
         //velocity = acceleration * deltaTime
-//        currentVelocity.add(Velocity.getVelocity(acceX,acceY,acceZ,deltaTime));
+        currentVelocity.add(Velocity.getVelocity(acceX,acceY,acceZ,deltaTime));
         //position = velocity * deltaTime
 //        cachedPosition.add(Position.getPosition(currentVelocity.x, currentVelocity.y, currentVelocity.z, deltaTime));
-        cachedPosition.addAndDivideByMillions(Position.getPositionFromAcceleration(acceX, acceY, acceZ, deltaTime));
+
     }
 
     //For right down and left down.
@@ -60,7 +63,7 @@ public class PositionManager {
             registerInitialPosition(currentTrackingPositionIndex);
         } else {
             savedPositions[currentTrackingPositionIndex] = cachedPosition;
-//            currentVelocity = new Velocity(0,0,0);
+            currentVelocity = new Velocity(0,0,0);
 //            cachedPosition = new Position(0,0,0);
         }
     }

@@ -19,31 +19,20 @@ public class Position {
         z = _z;
     }
 
-    public static Position getPosition(double veloX, double veloY, double veloZ, long deltaTime) {
-        return new Position(veloX * deltaTime / 1000, veloY * deltaTime / 1000, veloZ * deltaTime / 1000);
+    //0 = x, 1 = y, 2 = z
+    public static Position calculatePosition(long deltaTime, double[] velocity, double[] acceleration) {
+        double time = deltaTime / 1000d;
+        //s = s0 + v0 * t + 1/2 * a * t^2
+        double posX = velocity[0] * time + acceleration[0] * time * time / 2;
+        double posY = velocity[1] * time + acceleration[1] * time * time / 2;
+        double posZ = velocity[2] * time + acceleration[2] * time * time / 2;
+        return new Position(posX, posY, posZ);
     }
 
-    public static Position getPositionFromAcceleration(double acceX, double acceY, double acceZ, long deltaTime) {
-//        double deltaTimeSquare = (deltaTime / 1000d) * (deltaTime / 1000d);
-//        return new Position(acceX * deltaTimeSquare, acceY * deltaTimeSquare, acceZ * deltaTimeSquare);
-        double x1 = acceX * deltaTime *deltaTime;
-        double y1 = acceY * deltaTime *deltaTime;
-        double z1 = acceZ * deltaTime *deltaTime;
-        Log.i(SetupMode.TAG, "Delta time: " + deltaTime + " - Added pos : " + x1 + ", " + y1 + ", " + z1);
-        return new Position(acceX * deltaTime * deltaTime, acceY * deltaTime * deltaTime, acceZ * deltaTime * deltaTime);
-    }
 
     public void add(Position p) {
         x += p.x;
         y += p.y;
         z += p.z;
-    }
-
-    public void addAndDivideByMillions(Position p) {
-        long million = 1000000;
-        x += p.x /million;
-        y += p.y /million;
-        z += p.z /million;
-        Log.i(SetupMode.TAG, "Current pos : " + x + ", " + y + ", " + z);
     }
 }

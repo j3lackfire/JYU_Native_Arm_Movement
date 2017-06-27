@@ -15,8 +15,9 @@ public class Velocity {
         z = _z;
     }
 
-    public static Velocity getVelocity(double acceX, double acceY, double acceZ, long time) {
-        return new Velocity(acceX * time/1000, acceY * time/1000, acceZ * time/1000);
+    public static Velocity getVelocity(double acceX, double acceY, double acceZ, long deltaTime) {
+        double time = deltaTime / 1000;
+        return new Velocity(acceX * time, acceY * time, acceZ * time);
     }
 
     public void add(Velocity v) {
