@@ -123,9 +123,9 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
             playNextStepAudio(SetupLogic.getInstance().getCurrentSetupStep());
         }
         SetupLogic.getInstance().toNextStep();
-        //display the instruction to the user
         isDataSaved = false;
 
+        //display the instruction to the user
         String setupReportDisplayText =
                 "_______Current set up step: " + SetupLogic.getInstance().getCurrentSetupStep().name() + "\n" +
                 SetupLogic.getInstance().getInstructionText() + "\n--------------------\n" +

@@ -63,14 +63,15 @@ public class MySensorManager {
         rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
         previouslyChangedAccelerationTime = -1;
+        cachedDeltaTime = -1;
     }
 
     //The class calling this must implement SensorEventListener interface
     //called on OnResume
     public void registerSensors(SensorEventListener listener) {
-        sensorManager.registerListener(listener, sensorManager.getDefaultSensor(accelerationSensorType), SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.registerListener(listener, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.registerListener(listener, sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(listener, sensorManager.getDefaultSensor(accelerationSensorType), SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(listener, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(listener, sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     //called on on pause
@@ -106,7 +107,7 @@ public class MySensorManager {
                         averageData[0],
                         averageData[1],
                         averageData[2],
-                        deltaTime);
+                        cachedDeltaTime);
                 resetCachedValueData();
             }
         } else {
