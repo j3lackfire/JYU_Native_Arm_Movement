@@ -135,10 +135,11 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
             addCacheValueData(event.values);
             if (cachedDeltaTime >= minimumRefreshRate) {
                 accelerationData += "\n" + getDataInCSVFormat(previousTimeStamp - startRecordingTime, getAverageData());
+                //displaying
+                dataText.setText(dataText.getText().toString() + "\n" + getDataCSVShort(previousTimeStamp - startRecordingTime, getAverageData()));
+
                 resetCachedValueData();
             }
-            //displaying
-            dataText.setText(dataText.getText().toString() + "\n" + getDataCSVShort(previousTimeStamp - startRecordingTime, event.values));
         }
     }
 
