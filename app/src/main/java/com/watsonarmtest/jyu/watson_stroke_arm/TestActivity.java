@@ -17,12 +17,22 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class TestActivity extends AppCompatActivity implements SensorEventListener {
+    //settings
+    private long minimumRefreshRate = 200; //200 miliseconds
+
     //sensor stuffs
     SensorManager sensorManager;
     Sensor linearAccelerationSensor;
     private long startRecordingTime = -1;
     private long previousTimeStamp = -1;
+    private long cachedDeltaTime = -1;
+
+    private ArrayList<Float> averageAcceX;
+    private ArrayList<Float> averageAcceY;
+    private ArrayList<Float> averageAcceZ;
 
     //email stuffs
     private String defaultEmail = "j3lackfire@gmail.com";
@@ -43,6 +53,9 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
         linearAccelerationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         startRecordingTime = -1;
         previousTimeStamp = -1;
+        averageAcceX = new ArrayList<>();
+        averageAcceY = new ArrayList<>();
+        averageAcceZ = new ArrayList<>();
 
         //buttons
         buttonRecording = (Button) findViewById(R.id.button_recording);
@@ -80,8 +93,9 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
         buttonRecording.setText("Stop recording");
         //clear all of the acceleration data
         startRecordingTime = -1;
-        accelerationData = "Time,x,y,z";
+        accelerationData = "Time,x,y,z,zVelocity,zPos\n0,0,0,0,0,0";
         dataText.setText(accelerationData);
+        resetCachedValueData();
     }
 
     private void stopRecording() {
@@ -89,12 +103,11 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
         buttonRecording.setText("Start recording");
     }
 
-
     // ----------------- sensor stuffs ------------------------------
     @Override
     protected void onResume() {
         super.onResume();
-        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     @Override
@@ -105,29 +118,63 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
 
     @Override //import tant function
     public void onSensorChanged(SensorEvent event) {
-        if (startRecordingTime == -1) {
-            startRecordingTime = event.timestamp;
-            previousTimeStamp = event.timestamp;
-        }
-        long deltaTime = event.timestamp - previousTimeStamp;
-        previousTimeStamp = event.timestamp;
-
+        long timeStampMili = event.timestamp / 1000000;
         if (isRecordingData) {
-            accelerationData += "\n" + getDataInCSVFormat(previousTimeStamp - startRecordingTime, event.values);
+            if (startRecordingTime == -1) {
+                startRecordingTime = timeStampMili;
+                previousTimeStamp = timeStampMili;
+            }
+            long deltaTime = timeStampMili - previousTimeStamp;
+            if (cachedDeltaTime == -1) {
+                cachedDeltaTime = deltaTime;
+            } else {
+                cachedDeltaTime += deltaTime;
+            }
+            previousTimeStamp = timeStampMili;
+
+            addCacheValueData(event.values);
+            if (cachedDeltaTime >= minimumRefreshRate) {
+                accelerationData += "\n" + getDataInCSVFormat(previousTimeStamp - startRecordingTime, getAverageData());
+                resetCachedValueData();
+            }
             //displaying
             dataText.setText(dataText.getText().toString() + "\n" + getDataCSVShort(previousTimeStamp - startRecordingTime, event.values));
         }
     }
 
-    private String getDataInCSVFormat(long timeStampNano, float[] values) {
-        long oneMillion = 1000000;
-        long timeStampMili = timeStampNano / oneMillion;
+    private void addCacheValueData(float[] acceData) {
+        averageAcceX.add(acceData[0]);
+        averageAcceY.add(acceData[1]);
+        averageAcceZ.add(acceData[2]);
+    }
+
+    private float[] getAverageData() {
+        float averageX = 0;
+        float averageY = 0;
+        float averageZ = 0;
+        for (int i = 0; i < averageAcceX.size(); i ++) {
+            averageX += averageAcceX.get(i);
+            averageY += averageAcceY.get(i);
+            averageZ += averageAcceZ.get(i);
+        }
+        averageX /= averageAcceX.size();
+        averageY /= averageAcceX.size();
+        averageZ /= averageAcceX.size();
+        return new float[] {averageX, averageY, averageZ};
+    }
+
+    private void resetCachedValueData() {
+        averageAcceX.clear();
+        averageAcceY.clear();
+        averageAcceZ.clear();
+        cachedDeltaTime = -1;
+    }
+
+    private String getDataInCSVFormat(long timeStampMili, float[] values) {
         return timeStampMili + "," + values[0] + "," + values[1] + "," + values[2];
     }
 
-    private String getDataCSVShort(long timeStampNano, float[] values) {
-        long oneMillion = 1000000;
-        long timeStampMili = timeStampNano / oneMillion;
+    private String getDataCSVShort(long timeStampMili, float[] values) {
         return timeStampMili + "," + roundNumber(values[0]) + "," + roundNumber(values[1]) + "," + roundNumber(values[2]);
     }
 
