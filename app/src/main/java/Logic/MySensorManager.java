@@ -34,9 +34,9 @@ public class MySensorManager {
     private long positionTimer = 0; //cached value, don't worry about it.
     private long cachedDeltaTime = -1;
     private long stationaryTimer = 0; //cached value, don't worry about it.
-    private ArrayList<Float> averageAcceX;
-    private ArrayList<Float> averageAcceY;
-    private ArrayList<Float> averageAcceZ;
+    private ArrayList<Float> averageAcceX = new ArrayList<>();
+    private ArrayList<Float> averageAcceY = new ArrayList<>();
+    private ArrayList<Float> averageAcceZ = new ArrayList<>();
     /*
     Configuration data for the sensor recording step
     */
