@@ -214,8 +214,8 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
         return timeStampMili + "," + roundNumber(values[0]) + "," + roundNumber(values[1]) + "," + roundNumber(values[2]);
     }
 
-    private double roundNumber(double d) {
-        return Math.round(d * 100) / 100d;
+        private double roundNumber(double d) {
+            return Math.round(d * 100) / 100d;
     }
 
     @Override

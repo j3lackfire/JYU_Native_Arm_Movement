@@ -3,11 +3,15 @@ package com.watsonarmtest.jyu.watson_stroke_arm;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.hardware.SensorEventListener;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -21,6 +25,9 @@ import android.widget.Toast;
 import Logic.MySensorManager;
 
 public class DoctorMode extends AppCompatActivity implements SensorEventListener {
+
+    //Emergency number to call. Should be 112 but right now, it's Duc's number
+    private String emergencyNumber = "+358469556804";
 
     //report field
     private TextView currentDataView;
@@ -99,8 +106,23 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
 //        String reportText = sharedPreferences.getString(userSavedKey, "NOT EXISTED");
     }
 
+    private void callEmergencyNumber() {
+        //Check if the user has grant the call permission.
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+            Intent callIntent = new Intent(Intent.ACTION_CALL);
+            callIntent.setData(Uri.parse("tel:" + emergencyNumber));
+            startActivity(callIntent);
+        } else {
+            //request the permission
+            // REQUEST_CALL_PHONE is an
+            // app-defined int constant. The callback method gets the
+            // result of the request.
+            int REQUEST_CALL_PHONE = 0;
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CALL_PHONE}, REQUEST_CALL_PHONE);
+        }
+    }
 
-    //sensor stuffs
+    //------------sensor stuffs--------------
     @Override
     protected void onResume() {
         super.onResume();
@@ -126,7 +148,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         // Do nothing
     }
 
-    //Runnable, like a custom thread
+    //--------Second thread to count the time--------------
     public Runnable runnable = new Runnable() {
 
         public void run() {
@@ -141,6 +163,4 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         }
 
     };
-
-
 }
