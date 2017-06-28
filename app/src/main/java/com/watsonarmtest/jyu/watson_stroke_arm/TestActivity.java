@@ -137,16 +137,17 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
 
             addCacheValueData(event.values);
             if (cachedDeltaTime >= minimumRefreshRate) {
-                accelerationData += "\n" + getDataInCSVFormat(previousTimeStamp - startRecordingTime, getAverageAccelerationData());
+                float[] averageAccelerationData = getAverageAccelerationData();
+                accelerationData += "\n" + getDataInCSVFormat(previousTimeStamp - startRecordingTime, averageAccelerationData);
                 //calculate the velocity and position
-                double[] deltaPos = calculateDeltaPosition(previousVelocity, getAverageAccelerationData(), cachedDeltaTime);
-                double[] deltaVel = calculateDeltaVelocity(getAverageAccelerationData(), cachedDeltaTime);
+                double[] deltaPos = calculateDeltaPosition(previousVelocity, averageAccelerationData, cachedDeltaTime);
+                double[] deltaVel = calculateDeltaVelocity(averageAccelerationData, cachedDeltaTime);
                 for (int i = 0; i < 3; i ++) {
-                    previousPosition[i] = previousPosition[i] + deltaPos[i];
-                    previousVelocity[i] = previousVelocity[i] + deltaVel[i];
+                    previousPosition[i] += deltaPos[i];
+                    previousVelocity[i] += deltaVel[i];
                 }
                 accelerationData +=
-                        previousPosition[0] + "," +
+                        previousVelocity[0] + "," +
                         previousVelocity[1] + "," +
                         previousVelocity[2] + "," +
                         previousPosition[0] + "," +
@@ -160,20 +161,20 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    private double[] calculateDeltaVelocity(float[] acceleration, long deltaTimeMili) {
-        double[] returnDoubles = new double[]{0,0,0};
-        double deltaTime = deltaTimeMili / 1000;
-        for (int i = 0; i < returnDoubles.length; i ++) {
-            returnDoubles[i] = acceleration[i] * deltaTime;
+    private double[] calculateDeltaPosition(double[] vel, float[] acce, long deltaTimeMili ) {
+        double[] returnDoubles = new double[] {0,0,0};
+        double deltaTime = deltaTimeMili / 1000d;
+        for (int i = 0; i < 3; i ++) {
+            returnDoubles[i] = vel[i] * deltaTime + acce[i] * deltaTime * deltaTime / 2;
         }
         return returnDoubles;
     }
 
-    private double[] calculateDeltaPosition(double[] vel, float[] acce, long deltaTimeMili ) {
-        double[] returnDoubles = new double[] {0,0,0};
-        double deltaTime = deltaTimeMili / 1000;
-        for (int i = 0; i < returnDoubles.length; i ++) {
-            returnDoubles[i] = vel[i] * deltaTime + acce[i] * deltaTime * deltaTime / 2;
+    private double[] calculateDeltaVelocity(float[] acceleration, long deltaTimeMili) {
+        double[] returnDoubles = new double[]{0,0,0};
+        double deltaTime = deltaTimeMili / 1000d;
+        for (int i = 0; i < 3; i ++) {
+            returnDoubles[i] = acceleration[i] * deltaTime;
         }
         return returnDoubles;
     }

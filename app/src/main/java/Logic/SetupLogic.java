@@ -38,13 +38,13 @@ public class SetupLogic {
     public String setup_status;
 
     //data will be saved in a json format, and then stored as string
-    public String right_hand_down_position = "RIGHT_HAND_DOWN";
-    public String right_hand_front_position = "RIGHT_HAND_FRONT";
-    public String right_hand_up_position = "RIGHT_HAND_UP";
+    public static String right_hand_down_position = "RIGHT_HAND_DOWN";
+    public static String right_hand_front_position = "RIGHT_HAND_FRONT";
+    public static String right_hand_up_position = "RIGHT_HAND_UP";
 
-    public String left_hand_down_position = "LEFT_HAND_DOWN";
-    public String left_hand_front_position = "LEFT_HAND_FRONT";
-    public String left_hand_up_position = "LEFT_HAND_UP";
+    public static String left_hand_down_position = "LEFT_HAND_DOWN";
+    public static String left_hand_front_position = "LEFT_HAND_FRONT";
+    public static String left_hand_up_position = "LEFT_HAND_UP";
 
     //singleton
     private static SetupLogic instance;
@@ -58,7 +58,7 @@ public class SetupLogic {
     private SetupStep currentSetupStep = SetupStep.Not_Initialized;
 
     private SetupLogic() {
-        currentSetupStep = SetupStep.Reading_Instruction;
+        prepareLogic();
     }
 
     public void prepareLogic() {
@@ -119,8 +119,6 @@ public class SetupLogic {
         }
     }
 
-
-
     private SetupStep getNextStep(SetupStep step) {
         switch (step) {
             case Not_Initialized:
@@ -150,6 +148,7 @@ public class SetupLogic {
         return getSetupKey(currentSetupStep);
     }
 
+    //the key to save and load the captured data into the phone hard-drive
     public String getSetupKey(SetupStep step) {
         switch (step) {
             case Not_Initialized:

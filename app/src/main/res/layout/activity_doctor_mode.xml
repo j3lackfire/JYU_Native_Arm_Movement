@@ -8,13 +8,13 @@
 
     <TextView
         android:id="@+id/Doctor_mode_description"
-        android:layout_width="288dp"
-        android:layout_height="72dp"
+        android:layout_width="259dp"
+        android:layout_height="42dp"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/doctor_mode_description"
+        android:text="DOCTOR MODE"
         android:textAlignment="center"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -22,27 +22,23 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.019" />
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.504" />
 
     <Button
         android:id="@+id/button_back_to_main_page"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/button_back_to_main"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="50dp"
+        android:text="Main Page"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.178" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/current_sensor_data"
-        android:layout_width="347dp"
-        android:layout_height="180dp"
+        android:layout_width="339dp"
+        android:layout_height="240dp"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
@@ -50,36 +46,46 @@
         android:text="Current sensor data"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.526"
+        app:layout_constraintHorizontal_bias="0.517"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.415" />
+        app:layout_constraintVertical_bias="0.4" />
 
     <Button
-        android:id="@+id/button_save_sensor_data"
-        android:layout_width="162dp"
-        android:layout_height="42dp"
+        android:id="@+id/doctor_mode_button_next_step"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="322dp"
-        android:text="Save Sensor Data"
+        android:layout_marginTop="50dp"
+        android:text="Next Step"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintHorizontal_bias="0.52" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/saved_sensor_data"
-        android:layout_width="320dp"
-        android:layout_height="131dp"
+        android:layout_width="332dp"
+        android:layout_height="135dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="364dp"
+        android:layout_marginTop="372dp"
         android:text="saved sensor data"
         android:textSize="16sp"
-        app:layout_constraintHorizontal_bias="0.4"
+        app:layout_constraintHorizontal_bias="0.357"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button_call_emergency_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="135dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:text="Call Emergency Number"
+        app:layout_constraintBottom_toBottomOf="@+id/saved_sensor_data"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 </android.support.constraint.ConstraintLayout>

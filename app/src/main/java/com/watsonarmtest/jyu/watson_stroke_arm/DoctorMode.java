@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.SensorEventListener;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -20,8 +19,9 @@ import android.widget.TextView;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
-import android.widget.Toast;
 
+import Logic.DoctorLogic;
+import Logic.DoctorStep;
 import Logic.MySensorManager;
 
 public class DoctorMode extends AppCompatActivity implements SensorEventListener {
@@ -32,7 +32,6 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
     //report field
     private TextView currentDataView;
     private TextView savedDataView;
-    public static String savedSensorDataKey = "SAVED_SENSOR_DATA";
 
     //Handler, stuff that will run for very long
     private Handler handler;
@@ -46,6 +45,9 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doctor_mode);
+
+        //the logic
+        DoctorLogic.getInstance().prepareDoctorLogic();
 
         //handler for time action and threading
         handler = new Handler();
@@ -64,22 +66,29 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
             }
         });
 
-        Button buttonSaveSensorData = (Button) findViewById(R.id.button_save_sensor_data);
-        buttonSaveSensorData.setOnClickListener(new View.OnClickListener() {
+        Button nextStepButton = (Button) findViewById(R.id.doctor_mode_button_next_step);
+        nextStepButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveUserData();
+                toNextStep();
+            }
+        });
+
+        Button callEmergencyButton = (Button) findViewById(R.id.button_call_emergency_number);
+        callEmergencyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callEmergencyNumber();
             }
         });
 
         currentDataView = (TextView) findViewById(R.id.current_sensor_data);
         savedDataView = (TextView) findViewById(R.id.saved_sensor_data);
 
+        savedDataView.setText("Current setup step: " + DoctorLogic.getInstance().getCurrentDoctorStep());
+
         //get the previously saved data
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String savedSensorData = sharedPref.getString(savedSensorDataKey, "NOT EXISTED !!!!");
-        savedSensorData = "The previously saved data is:\n----------------\n" + savedSensorData + "\n--------------";
-        savedDataView.setText(savedSensorData);
     }
 
     private void goToMainPage() {
@@ -87,23 +96,24 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         startActivity(intent);
     }
 
-    private void saveUserData() {
+    private void toNextStep() {
         //get the position data and display it as string
-        String savedString = mySensorManager.getSensorDataJSON();
+        DoctorLogic.getInstance().toNextStep();
+        if (DoctorLogic.getInstance().getCurrentDoctorStep() == DoctorStep.Finish) {
+            String display = "Current setup step: " + DoctorLogic.getInstance().getCurrentDoctorStep();
+            display += "\n------------\nThe doctor mode is finish, you are healthy.";
+            savedDataView.setText(display);
+            Button nextStepButton = (Button) findViewById(R.id.doctor_mode_button_next_step);
+            nextStepButton.setVisibility(Button.INVISIBLE);
+            return;
+        }
+        String displayString = "Current setup step: " + DoctorLogic.getInstance().getCurrentDoctorStep();
+        displayString += "\n---------\nThe saved data for this position is: \n";
 
-        TextView reportText = (TextView) findViewById(R.id.saved_sensor_data);
-        reportText.setText("The user input is:\n--------------------------\n" + savedString);
-
-        //save it to the hard drive
+        //load the data
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = sharedPref.edit();
-
-        editor.putString(savedSensorDataKey, savedString);
-        editor.commit();
-
-        //Use this to read data from the shared preferences
-//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-//        String reportText = sharedPreferences.getString(userSavedKey, "NOT EXISTED");
+        displayString += sharedPref.getString(DoctorLogic.getInstance().getSetupKey(DoctorLogic.getInstance().getCurrentDoctorStep()), "-");
+        savedDataView.setText(displayString);
     }
 
     private void callEmergencyNumber() {

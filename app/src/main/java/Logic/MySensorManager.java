@@ -62,6 +62,7 @@ public class MySensorManager {
         gyroSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
+        //values for calculating the position.
         previouslyChangedAccelerationTime = -1;
         cachedDeltaTime = -1;
     }
@@ -125,12 +126,14 @@ public class MySensorManager {
         roundNumber();
     }
 
+    //to be used in the on sensor changed function to reduce the noise of the sensor data.
     private void addCacheValueData(float[] acceData) {
         averageAcceX.add(acceData[0]);
         averageAcceY.add(acceData[1]);
         averageAcceZ.add(acceData[2]);
     }
 
+    //same as the function above
     private float[] getAverageData() {
         float averageX = 0;
         float averageY = 0;
@@ -146,6 +149,7 @@ public class MySensorManager {
         return new float[] {averageX, averageY, averageZ};
     }
 
+    //same ...
     private void resetCachedValueData() {
         averageAcceX.clear();
         averageAcceY.clear();
@@ -153,6 +157,8 @@ public class MySensorManager {
         cachedDeltaTime = -1;
     }
 
+    //function to be called on every frame.
+    //used to check the timer and responsible for changing the steps
     public void updateSensorManager(long deltaTime) {
         positionTimer += deltaTime;
         stationaryTimer += deltaTime;
@@ -172,15 +178,20 @@ public class MySensorManager {
         }
     }
 
+    //next step is set, reset everything
     public void resetAllTimer() {
         stationaryTimer = 0;
         positionTimer = 0;
     }
 
-    public boolean shouldSaveUserPositionData() { return stationaryTimer >= maxStationaryTime; }
+    //if the phone is stationary for long enough of time
+    //register the position and jump to the next step
+    public boolean shouldRegisterUserPosition() { return stationaryTimer >= maxStationaryTime; }
 
+    //if the phone is moving, vibrate the phone
     public long getVibrateTime() { return shouldVibratePhone ? refreshTimeMili * 2 : -1; }
 
+    //check if the phone is stationary or not.
     private boolean isSignificantMovementDetected() {
         for (int i = 0; i < 3; i ++) {
             if (Math.abs(cachedAccelerationData[i]) > maximumDeltaAcceleration) {
@@ -200,6 +211,7 @@ public class MySensorManager {
 
     }
 
+    //ultilities function to make display easier to read
     private void roundNumber() {
         for (int i = 0; i < 3; i ++) {
             cachedAccelerationData[i] = Math.round(cachedAccelerationData[i]*100)/100d;
@@ -207,6 +219,7 @@ public class MySensorManager {
         }
     }
 
+    //JSON data is outed as time and position in 3 dimension
     public String getSensorDataJSON() {
         SavedValue savedValue = new SavedValue();
         savedValue.setTimeStamp(previousTime);
@@ -215,6 +228,7 @@ public class MySensorManager {
         return savedValue.myGetJsonString();
     }
 
+    //same as above but pretty JSON
     public String getSensorDataJSONPretty() {
         SavedValue savedValue = new SavedValue();
         savedValue.setTimeStamp(previousTime);
@@ -223,7 +237,7 @@ public class MySensorManager {
         return savedValue.myGetJsonStringPretty();
     }
 
-    public double[] getGyroData() { return cachedGyroData; }
-
-    public double[] getAccelerationData() { return cachedAccelerationData; }
+//    public double[] getGyroData() { return cachedGyroData; }
+//
+//    public double[] getAccelerationData() { return cachedAccelerationData; }
 }

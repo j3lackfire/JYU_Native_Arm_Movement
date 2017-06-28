@@ -19,7 +19,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import Logic.MySensorManager;
-import Logic.Position;
 import Logic.PositionManager;
 import Logic.SetupLogic;
 import Logic.SetupStep;
@@ -243,7 +242,7 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
                     }
                     //if the phone is stationary for a long enough period of time,
                     //we save the position data
-                    if (mySensorManager.shouldSaveUserPositionData()) {
+                    if (mySensorManager.shouldRegisterUserPosition()) {
                         saveUserPositionData();
                         playNextStepAudio(SetupLogic.getInstance().getCurrentSetupStep());
                         mySensorManager.resetAllTimer();
