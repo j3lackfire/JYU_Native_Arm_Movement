@@ -142,17 +142,26 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
                 //calculate the velocity and position
                 double[] deltaPos = calculateDeltaPosition(previousVelocity, averageAccelerationData, cachedDeltaTime);
                 double[] deltaVel = calculateDeltaVelocity(averageAccelerationData, cachedDeltaTime);
+
+                double[] currentVelocity = new double[]{0d,0d,0d};
+                double[] currentPosition = new double[]{0d,0d,0d};
+
                 for (int i = 0; i < 3; i ++) {
-                    previousPosition[i] += deltaPos[i];
-                    previousVelocity[i] += deltaVel[i];
+                    currentVelocity[i] = previousVelocity[i] + deltaVel[i];
+                    currentPosition[i] = previousPosition[i] + deltaPos[i];
                 }
                 accelerationData +=
-                        previousVelocity[0] + "," +
-                        previousVelocity[1] + "," +
-                        previousVelocity[2] + "," +
-                        previousPosition[0] + "," +
-                        previousPosition[1] + "," +
-                        previousPosition[2] + ",";
+                        currentVelocity[0] + "," +
+                        currentVelocity[1] + "," +
+                        currentVelocity[2] + "," +
+                        currentPosition[0] + "," +
+                        currentPosition[1] + "," +
+                        currentPosition[2];
+
+                for (int i = 0; i < 3; i ++) {
+                    previousVelocity[i] = currentVelocity[i];
+                    previousPosition[i] = currentPosition[i];
+                }
                 //displaying
                 dataText.setText(dataText.getText().toString() + "\n" + getDataCSVShort(previousTimeStamp - startRecordingTime, getAverageAccelerationData()));
 

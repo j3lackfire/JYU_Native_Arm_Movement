@@ -95,4 +95,16 @@ public class DoctorLogic {
                 return SetupLogic.left_hand_up_position;
         }
     }
+
+    ///if the phone is moving, check if it reaches the destined position
+    public boolean shouldTrackPosition() {
+        switch (currentDoctorStep) {
+            case Right_Hand_Down_To_Front:
+            case Right_Hand_Front_To_Up:
+            case Left_Hand_Down_To_Front:
+            case Left_Hand_Front_To_Up:
+                return true;
+        }
+        return false;
+    }
 }

@@ -164,6 +164,25 @@ public class MySensorManager {
         stationaryTimer += deltaTime;
         if (positionTimer >= refreshTimeMili) {
             //check if there are significant movement
+            if (isPhoneMovementDetected()) {
+                //reset the timer
+                stationaryTimer = 0;
+                //vibrate the phone
+                shouldVibratePhone = true;
+            } else {
+                shouldVibratePhone = false;
+            }
+            //save the new data
+//            savedAccelerationData = cachedAccelerationData;
+            savedGyroData = cachedGyroData;
+        }
+    }
+
+    public void updateSensorManagerDoctorMode(long deltaTime) {
+        positionTimer += deltaTime;
+        stationaryTimer += deltaTime;
+        if (positionTimer >= refreshTimeMili) {
+            //check if there are significant movement
             if (isSignificantMovementDetected()) {
                 //reset the timer
                 stationaryTimer = 0;
@@ -176,6 +195,7 @@ public class MySensorManager {
 //            savedAccelerationData = cachedAccelerationData;
             savedGyroData = cachedGyroData;
         }
+
     }
 
     //next step is set, reset everything
@@ -192,7 +212,7 @@ public class MySensorManager {
     public long getVibrateTime() { return shouldVibratePhone ? refreshTimeMili * 2 : -1; }
 
     //check if the phone is stationary or not.
-    private boolean isSignificantMovementDetected() {
+    private boolean isPhoneMovementDetected() {
         for (int i = 0; i < 3; i ++) {
             if (Math.abs(cachedAccelerationData[i]) > maximumDeltaAcceleration) {
                 return true;
@@ -209,6 +229,15 @@ public class MySensorManager {
         }
         return false;
 
+    }
+
+    private  boolean isSignificantMovementDetected() {
+        for (int i = 0; i < 3; i ++) {
+            if (Math.abs(cachedAccelerationData[i]) > maximumDeltaAcceleration * 2) {
+                return true;
+            }
+        }
+        return false;
     }
 
     //ultilities function to make display easier to read

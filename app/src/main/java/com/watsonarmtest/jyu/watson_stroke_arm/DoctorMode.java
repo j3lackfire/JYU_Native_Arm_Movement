@@ -8,6 +8,7 @@ import android.hardware.SensorEventListener;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -35,11 +36,16 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
 
     //Handler, stuff that will run for very long
     private Handler handler;
+    private Vibrator vibrator;
+
     private long startTime;
     private long currentTime;
 
     //sensor and stuff
     private MySensorManager mySensorManager;
+
+    Button nextStepButton;
+    Button callEmergencyButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +62,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
 
         //register the sensor
         mySensorManager = new MySensorManager((SensorManager)getSystemService(Context.SENSOR_SERVICE));
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         //the buttons and UI stuffs
         Button backToMainPageButton = (Button) findViewById(R.id.button_back_to_main_page);
@@ -66,7 +73,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
             }
         });
 
-        Button nextStepButton = (Button) findViewById(R.id.doctor_mode_button_next_step);
+        nextStepButton = (Button) findViewById(R.id.doctor_mode_button_next_step);
         nextStepButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,13 +81,15 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
             }
         });
 
-        Button callEmergencyButton = (Button) findViewById(R.id.button_call_emergency_number);
+        callEmergencyButton = (Button) findViewById(R.id.button_call_emergency_number);
         callEmergencyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 callEmergencyNumber();
             }
         });
+        callEmergencyButton.setVisibility(Button.INVISIBLE);
+
 
         currentDataView = (TextView) findViewById(R.id.current_sensor_data);
         savedDataView = (TextView) findViewById(R.id.saved_sensor_data);
@@ -103,7 +112,6 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
             String display = "Current setup step: " + DoctorLogic.getInstance().getCurrentDoctorStep();
             display += "\n------------\nThe doctor mode is finish, you are healthy.";
             savedDataView.setText(display);
-            Button nextStepButton = (Button) findViewById(R.id.doctor_mode_button_next_step);
             nextStepButton.setVisibility(Button.INVISIBLE);
             return;
         }
@@ -114,6 +122,10 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         displayString += sharedPref.getString(DoctorLogic.getInstance().getSetupKey(DoctorLogic.getInstance().getCurrentDoctorStep()), "-");
         savedDataView.setText(displayString);
+    }
+
+    public void showEmergency() {
+        callEmergencyButton.setVisibility(Button.VISIBLE );
     }
 
     private void callEmergencyNumber() {
@@ -163,10 +175,21 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
 
         public void run() {
 
+            long deltaTime = currentTime;
             currentTime = SystemClock.uptimeMillis() - startTime;
-            String outputString =
-                "Current time: " + currentTime + "\n" +
-                mySensorManager.getSensorDataJSONPretty();
+            deltaTime = currentTime - deltaTime;
+            String outputString = "Current time: " + currentTime;
+            if (DoctorLogic.getInstance().isTrackingMotion()) {
+                mySensorManager.updateSensorManagerDoctorMode(deltaTime);
+                outputString += "\n" + mySensorManager.getSensorDataJSONPretty();
+                if (DoctorLogic.getInstance().isTrackingMotion()) {
+
+                } else {
+                    if (mySensorManager.getVibrateTime() > 0) {
+                        vibrator.vibrate(mySensorManager.getVibrateTime());
+                    }
+                }
+            }
 
             currentDataView.setText(outputString);
             handler.postDelayed(this, 0);
