@@ -124,8 +124,12 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         savedDataView.setText(displayString);
     }
 
-    public void showEmergency() {
-        callEmergencyButton.setVisibility(Button.VISIBLE );
+    private void showEmergency() {
+        callEmergencyButton.setVisibility(Button.VISIBLE);
+    }
+
+    private void hideEmergency() {
+        callEmergencyButton.setVisibility(Button.INVISIBLE);
     }
 
     private void callEmergencyNumber() {
@@ -182,12 +186,14 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
             if (DoctorLogic.getInstance().isTrackingMotion()) {
                 mySensorManager.updateSensorManagerDoctorMode(deltaTime);
                 outputString += "\n" + mySensorManager.getSensorDataJSONPretty();
-                if (DoctorLogic.getInstance().isTrackingMotion()) {
-
+                if (DoctorLogic.getInstance().shouldTrackPosition()) {
+                    //check if the current position match the saved position.
                 } else {
                     if (mySensorManager.getVibrateTime() > 0) {
                         vibrator.vibrate(mySensorManager.getVibrateTime());
+                        showEmergency();
                     }
+//                    if ()
                 }
             }
 

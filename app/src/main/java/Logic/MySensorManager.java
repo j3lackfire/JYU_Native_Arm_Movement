@@ -44,6 +44,7 @@ public class MySensorManager {
     private long minimumRefreshRate = 200; //200 miliseconds
 
     private long maxStationaryTime = 2000; //milliseconds, 2000 is 2 second
+    private long doctorStationaryTime = 5000;
 
     //if the current value goes beyond this value, mark as the phone is still moving.
     private double maximumDeltaAcceleration = 0.5;
@@ -207,6 +208,8 @@ public class MySensorManager {
     //if the phone is stationary for long enough of time
     //register the position and jump to the next step
     public boolean shouldRegisterUserPosition() { return stationaryTimer >= maxStationaryTime; }
+
+    public boolean isStationaryLongEnough() { return stationaryTimer >= doctorStationaryTime; }
 
     //if the phone is moving, vibrate the phone
     public long getVibrateTime() { return shouldVibratePhone ? refreshTimeMili * 2 : -1; }

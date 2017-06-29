@@ -22,6 +22,8 @@ import java.util.ArrayList;
 public class TestActivity extends AppCompatActivity implements SensorEventListener {
     //settings
     private long minimumRefreshRate = 200; //200 miliseconds
+    //ramp-speed - play with this value until satisfied
+    private float kFilteringFactor = 0.1d;
 
     //sensor stuffs
     SensorManager sensorManager;
@@ -36,6 +38,7 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
 
     private double[] previousVelocity = new double[]{0,0,0};
     private double[] previousPosition = new double[]{0,0,0};
+    private float[] accel = new float[]{0,0,0};
 
     //email stuffs
     private String defaultEmail = "j3lackfire@gmail.com";
@@ -138,6 +141,7 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
             addCacheValueData(event.values);
             if (cachedDeltaTime >= minimumRefreshRate) {
                 float[] averageAccelerationData = getAverageAccelerationData();
+                averageAccelerationData = denoiseData(averageAccelerationData);
                 accelerationData += "\n" + getDataInCSVFormat(previousTimeStamp - startRecordingTime, averageAccelerationData);
                 //calculate the velocity and position
                 double[] deltaPos = calculateDeltaPosition(previousVelocity, averageAccelerationData, cachedDeltaTime);
@@ -224,8 +228,19 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
         return timeStampMili + "," + roundNumber(values[0]) + "," + roundNumber(values[1]) + "," + roundNumber(values[2]);
     }
 
-        private double roundNumber(double d) {
+    private double roundNumber(double d) {
             return Math.round(d * 100) / 100d;
+    }
+
+    private float[] denoiseData(float[] acceleration) {
+        float[] result = new float[3];
+        accel[0] = acceleration[0] * kFilteringFactor + accel[0] * (1.0f - kFilteringFactor);
+        accel[1] = acceleration[1] * kFilteringFactor + accel[1] * (1.0f - kFilteringFactor);
+        accel[2] = acceleration[2] * kFilteringFactor + accel[2] * (1.0f - kFilteringFactor);
+        result[0] = acceleration[0] - accel[0];
+        result[1] = acceleration[1] - accel[1];
+        result[2] = acceleration[2] - accel[2];
+        return result;
     }
 
     @Override
