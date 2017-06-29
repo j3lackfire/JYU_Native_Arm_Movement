@@ -217,7 +217,7 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private String getDataInCSVFormat(long timeStampMili, float[] values) {
-        return timeStampMili + "," + values[0] + "," + values[1] + "," + values[2];
+        return timeStampMili + "," + values[0] + "," + values[1] + "," + values[2] + ",";
     }
 
     private String getDataCSVShort(long timeStampMili, float[] values) {
