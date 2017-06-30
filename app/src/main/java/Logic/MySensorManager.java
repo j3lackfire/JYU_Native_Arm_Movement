@@ -44,7 +44,7 @@ public class MySensorManager {
     private long minimumRefreshRate = 200; //200 miliseconds
 
     private long maxStationaryTime = 2000; //milliseconds, 2000 is 2 second
-    private long doctorStationaryTime = 5000;
+    private long doctorStationaryTime =5000; // hold the phone still for
 
     //if the current value goes beyond this value, mark as the phone is still moving.
     private double maximumDeltaAcceleration = 0.5;
@@ -183,20 +183,34 @@ public class MySensorManager {
         positionTimer += deltaTime;
         stationaryTimer += deltaTime;
         if (positionTimer >= refreshTimeMili) {
-            //check if there are significant movement
-            if (isSignificantMovementDetected()) {
-                //reset the timer
-                stationaryTimer = 0;
-                //vibrate the phone
-                shouldVibratePhone = true;
+            //if the system is tracking motion, check if the phone has reached the target position
+            //if the system is not tracking motion, check if there are any significant movement appear
+            if (DoctorLogic.getInstance().isTrackingMotion()) {
+                
             } else {
-                shouldVibratePhone = false;
+                //check if there are significant movement
+                if (isSignificantMovementDetected()) {
+                    //reset the timer
+                    stationaryTimer = 0;
+                    //vibrate the phone
+                    shouldVibratePhone = true;
+                } else {
+                    shouldVibratePhone = false;
+                }
             }
             //save the new data
 //            savedAccelerationData = cachedAccelerationData;
             savedGyroData = cachedGyroData;
         }
 
+    }
+
+    //if the phone is moving, check if the target moving is reached.
+    private boolean isTargetPositionReached() {
+        double targetedZPos = DoctorLogic.getInstance().getCurrentSavedValue().frontBack;
+        // if it is very close to the target position
+        //if the difference between "current position" and "saved position" is small,
+        return (Math.abs(PositionManager.getInstance().getCurrentPosition()[2] - targetedZPos) < 0.05);
     }
 
     //next step is set, reset everything

@@ -1,5 +1,7 @@
 package Logic;
 
+import android.content.SharedPreferences;
+
 /**
  * Created by Le Pham Minh Duc on 6/28/2017.
  */
@@ -14,6 +16,8 @@ public class DoctorLogic {
         }
         return instance;
     }
+
+    private SavedValue[] previouslySavedValue;
 
     private DoctorStep currentDoctorStep = DoctorStep.Not_Initialized;
 
@@ -95,6 +99,63 @@ public class DoctorLogic {
                 return SetupLogic.left_hand_up_position;
         }
     }
+
+    public void prepareAllSavedValue(SharedPreferences sharedPref) {
+        String jsonString;
+        for (int i = 0; i < 6; i ++) {
+            jsonString = sharedPref.getString(getSetupKeyFromIndex(i), "-");
+            if (jsonString.equals("-")) {
+                previouslySavedValue[i] = new SavedValue();
+            } else {
+                previouslySavedValue[i] = SavedValue.fromJson(jsonString);
+            }
+        }
+    }
+
+    //used for the function above
+    private String getSetupKeyFromIndex(int index) {
+        switch (index) {
+            case 0:
+                return SetupLogic.right_hand_down_position;
+            case 1:
+                return SetupLogic.right_hand_front_position;
+            case 2:
+                return SetupLogic.right_hand_up_position;
+            case 3:
+                return SetupLogic.left_hand_down_position;
+            case 4:
+                return SetupLogic.left_hand_front_position;
+            case 5:
+                return SetupLogic.left_hand_up_position;
+            default:
+                return "Invalid";
+        }
+    }
+
+    public SavedValue getCurrentSavedValue() {
+        switch (currentDoctorStep) {
+            default:
+                return new SavedValue();
+
+            case Right_Hand_Down:
+                return previouslySavedValue[0];
+            case Right_Hand_Down_To_Front:
+            case Right_Hand_Front:
+                return previouslySavedValue[1];
+            case Right_Hand_Front_To_Up:
+            case Right_Hand_Up:
+                return previouslySavedValue[2];
+            case Left_Hand_Down:
+                return previouslySavedValue[3];
+            case Left_Hand_Down_To_Front:
+            case Left_Hand_Front:
+                return previouslySavedValue[4];
+            case Left_Hand_Front_To_Up:
+            case Left_Hand_Up:
+                return previouslySavedValue[5];
+        }
+    }
+
 
     ///if the phone is moving, check if it reaches the destined position
     public boolean shouldTrackPosition() {

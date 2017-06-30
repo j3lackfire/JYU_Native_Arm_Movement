@@ -90,7 +90,6 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         });
         callEmergencyButton.setVisibility(Button.INVISIBLE);
 
-
         currentDataView = (TextView) findViewById(R.id.current_sensor_data);
         savedDataView = (TextView) findViewById(R.id.saved_sensor_data);
 
@@ -98,6 +97,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
 
         //get the previously saved data
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        DoctorLogic.getInstance().prepareAllSavedValue(sharedPref);
     }
 
     private void goToMainPage() {
