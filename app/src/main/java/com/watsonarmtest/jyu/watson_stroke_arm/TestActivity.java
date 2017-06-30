@@ -23,7 +23,7 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
     //settings
     private long minimumRefreshRate = 200; //200 miliseconds
     //ramp-speed - play with this value until satisfied
-    private float kFilteringFactor = 0.1d;
+    private float kFilteringFactor = 0.1f;
 
     //sensor stuffs
     SensorManager sensorManager;
