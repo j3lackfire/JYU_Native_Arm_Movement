@@ -245,7 +245,7 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
                     if (mySensorManager.shouldRegisterUserPosition()) {
                         saveUserPositionData();
                         playNextStepAudio(SetupLogic.getInstance().getCurrentSetupStep());
-                        mySensorManager.resetAllTimer();
+                        mySensorManager.toNextStep();
                     }
                 } else {
                     //if the data is saved, that means this step is completed,

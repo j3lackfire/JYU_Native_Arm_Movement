@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.SensorEventListener;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -24,6 +25,7 @@ import android.hardware.SensorManager;
 import Logic.DoctorLogic;
 import Logic.DoctorStep;
 import Logic.MySensorManager;
+import Logic.SetupStep;
 
 public class DoctorMode extends AppCompatActivity implements SensorEventListener {
 
@@ -43,6 +45,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
 
     //sensor and stuff
     private MySensorManager mySensorManager;
+    private MediaPlayer nextStepAudio;
 
     Button nextStepButton;
     Button callEmergencyButton;
@@ -108,6 +111,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
     private void toNextStep() {
         //get the position data and display it as string
         DoctorLogic.getInstance().toNextStep();
+        mySensorManager.toNextStep();
         if (DoctorLogic.getInstance().getCurrentDoctorStep() == DoctorStep.Finish) {
             String display = "Current setup step: " + DoctorLogic.getInstance().getCurrentDoctorStep();
             display += "\n------------\nThe doctor mode is finish, you are healthy.";
@@ -148,6 +152,47 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         }
     }
 
+    private void playAudio(DoctorStep currentSetupStep) {
+        if (nextStepAudio != null) {
+            nextStepAudio.stop();
+        }
+        switch (currentSetupStep) {
+            case Reading_Instruction:
+                nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.right_hand_down_position);
+                break;
+            case Right_Hand_Down:
+                nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.right_hand_front_position);
+                break;
+            case Right_Hand_Front:
+                nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.right_hand_up_position);
+                break;
+            case Right_Hand_Up:
+                nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.left_hand_down_position);
+                break;
+            case Left_Hand_Down:
+                nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.left_hand_front_position);
+                break;
+            case Left_Hand_Front:
+                nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.left_hand_up_position);
+                break;
+            case Left_Hand_Up:
+                nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.finish);
+                break;
+            case Right_Hand_Down_To_Front:
+            case Right_Hand_Front_To_Up:
+            case Left_Hand_Down_To_Front:
+            case Left_Hand_Front_To_Up:
+                nextStepAudio = MediaPlayer.create(DoctorMode.this, R.raw.next_step);
+                break;
+
+            default:
+                nextStepAudio = null;
+
+        }
+        nextStepAudio.start();
+    }
+    
+
     //------------sensor stuffs--------------
     @Override
     protected void onResume() {
@@ -183,9 +228,12 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
             currentTime = SystemClock.uptimeMillis() - startTime;
             deltaTime = currentTime - deltaTime;
             String outputString = "Current time: " + currentTime;
+            mySensorManager.updateSensorManagerDoctorMode(deltaTime);
             if (DoctorLogic.getInstance().isTrackingMotion()) {
-                mySensorManager.updateSensorManagerDoctorMode(deltaTime);
                 outputString += "\n" + mySensorManager.getSensorDataJSONPretty();
+                if (mySensorManager.isThisStepFail()) {
+                    showEmergency();
+                }
                 if (DoctorLogic.getInstance().shouldTrackPosition()) {
                     //check if the current position match the saved position.
                 } else {

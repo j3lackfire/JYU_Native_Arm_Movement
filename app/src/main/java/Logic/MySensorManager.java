@@ -31,9 +31,12 @@ public class MySensorManager {
     private double[] cachedGyroData = {-1,-1,-1};
     private double[] cachedRotationData = {-1,-1,-1,-1};
 
+    private  boolean isStepFail = false;
     private long positionTimer = 0; //cached value, don't worry about it.
     private long cachedDeltaTime = -1;
     private long stationaryTimer = 0; //cached value, don't worry about it.
+    private long currentStepTimer = 0; //how long the user have been at this step
+    private long maximumStepTimer = 5000; //the maximum time the use can stay in a step
     private ArrayList<Float> averageAcceX = new ArrayList<>();
     private ArrayList<Float> averageAcceY = new ArrayList<>();
     private ArrayList<Float> averageAcceZ = new ArrayList<>();
@@ -66,6 +69,7 @@ public class MySensorManager {
         //values for calculating the position.
         previouslyChangedAccelerationTime = -1;
         cachedDeltaTime = -1;
+        isStepFail = false;
     }
 
     //The class calling this must implement SensorEventListener interface
@@ -182,14 +186,23 @@ public class MySensorManager {
     public void updateSensorManagerDoctorMode(long deltaTime) {
         positionTimer += deltaTime;
         stationaryTimer += deltaTime;
+        currentStepTimer += deltaTime;
         if (positionTimer >= refreshTimeMili) {
             //if the system is tracking motion, check if the phone has reached the target position
             //if the system is not tracking motion, check if there are any significant movement appear
             if (DoctorLogic.getInstance().isTrackingMotion()) {
-                
+                //if the user takes too long to reach the position, it's fail
+                if (isPhoneMovementDetected()) {
+                    shouldVibratePhone = true;
+                }
+                if (currentStepTimer > maximumStepTimer) {
+                    isStepFail = true;
+                }
+
             } else {
                 //check if there are significant movement
                 if (isSignificantMovementDetected()) {
+                    isStepFail = true;
                     //reset the timer
                     stationaryTimer = 0;
                     //vibrate the phone
@@ -202,8 +215,9 @@ public class MySensorManager {
 //            savedAccelerationData = cachedAccelerationData;
             savedGyroData = cachedGyroData;
         }
-
     }
+
+    public boolean isThisStepFail() { return isStepFail; }
 
     //if the phone is moving, check if the target moving is reached.
     private boolean isTargetPositionReached() {
@@ -214,9 +228,11 @@ public class MySensorManager {
     }
 
     //next step is set, reset everything
-    public void resetAllTimer() {
+    public void toNextStep() {
         stationaryTimer = 0;
         positionTimer = 0;
+        currentStepTimer = 0;
+        isStepFail = false;
     }
 
     //if the phone is stationary for long enough of time
