@@ -243,7 +243,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
                     if (mySensorManager.isThisStepFail()) {
                         onStepFailed();
                     } else {
-                        mySensorManager.isDoctorStepCompleted() {
+                        if (mySensorManager.isDoctorStepCompleted()) {
                             toNextStep();
                         }
                     }
@@ -252,7 +252,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
                         vibrator.vibrate(mySensorManager.getVibrateTime());
                         onStepFailed();
                     } else {
-                        mySensorManager.isDoctorStepCompleted() {
+                        if (mySensorManager.isDoctorStepCompleted()) {
                             toNextStep();
                         }
                     }
