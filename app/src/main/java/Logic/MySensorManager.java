@@ -219,6 +219,8 @@ public class MySensorManager {
 
     public boolean isThisStepFail() { return isStepFail; }
 
+    public boolean isDoctorStepCompleted() { return stationaryTimer >= doctorStationaryTime; }
+
     //if the phone is moving, check if the target moving is reached.
     private boolean isTargetPositionReached() {
         double targetedZPos = DoctorLogic.getInstance().getCurrentSavedValue().frontBack;

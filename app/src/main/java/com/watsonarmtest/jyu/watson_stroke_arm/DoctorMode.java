@@ -25,7 +25,6 @@ import android.hardware.SensorManager;
 import Logic.DoctorLogic;
 import Logic.DoctorStep;
 import Logic.MySensorManager;
-import Logic.SetupStep;
 
 public class DoctorMode extends AppCompatActivity implements SensorEventListener {
 
@@ -128,8 +127,9 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         savedDataView.setText(displayString);
     }
 
-    private void showEmergency() {
+    private void onStepFailed() {
         callEmergencyButton.setVisibility(Button.VISIBLE);
+        playFailAudio();
     }
 
     private void hideEmergency() {
@@ -182,7 +182,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
             case Right_Hand_Front_To_Up:
             case Left_Hand_Down_To_Front:
             case Left_Hand_Front_To_Up:
-                nextStepAudio = MediaPlayer.create(DoctorMode.this, R.raw.next_step);
+                nextStepAudio = MediaPlayer.create(DoctorMode.this, R.raw.position_reached_hold_5sec);
                 break;
 
             default:
@@ -191,7 +191,14 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         }
         nextStepAudio.start();
     }
-    
+
+    private void playFailAudio() {
+        if (nextStepAudio != null ){
+            nextStepAudio.stop();
+        }
+        nextStepAudio = MediaPlayer.create(DoctorMode.this, R.raw.failed_press_next);
+        nextStepAudio.start();
+    }
 
     //------------sensor stuffs--------------
     @Override
@@ -230,18 +237,26 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
             String outputString = "Current time: " + currentTime;
             mySensorManager.updateSensorManagerDoctorMode(deltaTime);
             if (DoctorLogic.getInstance().isTrackingMotion()) {
-                outputString += "\n" + mySensorManager.getSensorDataJSONPretty();
-                if (mySensorManager.isThisStepFail()) {
-                    showEmergency();
-                }
                 if (DoctorLogic.getInstance().shouldTrackPosition()) {
                     //check if the current position match the saved position.
-                } else {
-                    if (mySensorManager.getVibrateTime() > 0) {
-                        vibrator.vibrate(mySensorManager.getVibrateTime());
-                        showEmergency();
+                    outputString += "\n" + mySensorManager.getSensorDataJSONPretty();
+                    if (mySensorManager.isThisStepFail()) {
+                        onStepFailed();
+                    } else {
+                        mySensorManager.isDoctorStepCompleted() {
+                            toNextStep();
+                        }
                     }
-//                    if ()
+                } else {
+                    if (mySensorManager.isThisStepFail()) {
+                        vibrator.vibrate(mySensorManager.getVibrateTime());
+                        onStepFailed();
+                    } else {
+                        mySensorManager.isDoctorStepCompleted() {
+                            toNextStep();
+                        }
+                    }
+
                 }
             }
 
