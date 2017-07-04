@@ -32,6 +32,7 @@ public class MySensorManager {
     private double[] cachedRotationData = {-1,-1,-1,-1};
 
     private  boolean isStepFail = false;
+
     private long positionTimer = 0; //cached value, don't worry about it.
     private long cachedDeltaTime = -1;
     private long stationaryTimer = 0; //cached value, don't worry about it.
@@ -190,7 +191,7 @@ public class MySensorManager {
         if (positionTimer >= refreshTimeMili) {
             //if the system is tracking motion, check if the phone has reached the target position
             //if the system is not tracking motion, check if there are any significant movement appear
-            if (DoctorLogic.getInstance().isTrackingMotion()) {
+            if (DoctorLogic.getInstance().shouldTrackPosition()) {
                 //if the user takes too long to reach the position, it's fail
                 if (isPhoneMovementDetected()) {
                     shouldVibratePhone = true;
@@ -198,7 +199,6 @@ public class MySensorManager {
                 if (currentStepTimer > maximumStepTimer) {
                     isStepFail = true;
                 }
-
             } else {
                 //check if there are significant movement
                 if (isSignificantMovementDetected()) {
@@ -218,6 +218,8 @@ public class MySensorManager {
     }
 
     public boolean isThisStepFail() { return isStepFail; }
+
+    public long getStationaryTimer() {return stationaryTimer;}
 
     public boolean isDoctorStepCompleted() { return stationaryTimer >= doctorStationaryTime; }
 

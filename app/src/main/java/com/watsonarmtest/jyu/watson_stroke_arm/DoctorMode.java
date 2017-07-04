@@ -111,6 +111,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         //get the position data and display it as string
         DoctorLogic.getInstance().toNextStep();
         mySensorManager.toNextStep();
+        playAudio(DoctorLogic.getInstance().getCurrentDoctorStep() );
         hideEmergency();
         if (DoctorLogic.getInstance().getCurrentDoctorStep() == DoctorStep.Finish) {
             String display = "Current setup step: " + DoctorLogic.getInstance().getCurrentDoctorStep();
@@ -158,34 +159,35 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
             nextStepAudio.stop();
         }
         switch (currentSetupStep) {
-            case Reading_Instruction:
+            case Right_Hand_Down:
                 nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.right_hand_down_position);
                 break;
-            case Right_Hand_Down:
+            case Right_Hand_Down_To_Front:
                 nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.right_hand_front_position);
                 break;
-            case Right_Hand_Front:
+            case Right_Hand_Front_To_Up:
                 nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.right_hand_up_position);
                 break;
-            case Right_Hand_Up:
+            case Left_Hand_Down:
                 nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.left_hand_down_position);
                 break;
-            case Left_Hand_Down:
+            case Left_Hand_Down_To_Front:
                 nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.left_hand_front_position);
                 break;
-            case Left_Hand_Front:
+            case Left_Hand_Front_To_Up:
                 nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.left_hand_up_position);
                 break;
-            case Left_Hand_Up:
+            case Finish:
                 nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.finish);
                 break;
-            case Right_Hand_Down_To_Front:
-            case Right_Hand_Front_To_Up:
-            case Left_Hand_Down_To_Front:
-            case Left_Hand_Front_To_Up:
+            case Right_Hand_Front:
+            case Left_Hand_Front:
+            case Left_Hand_Up:
+            case Right_Hand_Up:
                 nextStepAudio = MediaPlayer.create(DoctorMode.this, R.raw.position_reached_hold_5sec);
                 break;
 
+            case Reading_Instruction:
             default:
                 nextStepAudio = null;
 
@@ -238,27 +240,35 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
             String outputString = "Current time: " + currentTime;
             mySensorManager.updateSensorManagerDoctorMode(deltaTime);
             if (DoctorLogic.getInstance().isTrackingMotion()) {
-                if (DoctorLogic.getInstance().shouldTrackPosition()) {
-                    //check if the current position match the saved position.
-                    outputString += "\n" + mySensorManager.getSensorDataJSONPretty();
-                    if (mySensorManager.isThisStepFail()) {
-                        onStepFailed();
-                    } else {
-                        if (mySensorManager.isDoctorStepCompleted()) {
-                            toNextStep();
-                        }
-                    }
+                if (mySensorManager.isThisStepFail()) {
+                    outputString = "\nCurrent step failed" +
+                            "\nProcess to the next position and press NEXT STEP" +
+                            "\nPress call emergency if you feel dangerous";
                 } else {
-                    if (mySensorManager.isThisStepFail()) {
-                        vibrator.vibrate(mySensorManager.getVibrateTime());
-                        onStepFailed();
+                    if (DoctorLogic.getInstance().shouldTrackPosition()) {
+                        //check if the current position match the saved position.
+                        outputString += "\n" + mySensorManager.getSensorDataJSONPretty();
+                        if (mySensorManager.isThisStepFail()) {
+                            onStepFailed();
+                        } else {
+                            if (mySensorManager.isDoctorStepCompleted()) {
+                                toNextStep();
+                            }
+                        }
                     } else {
-                        if (mySensorManager.isDoctorStepCompleted()) {
-                            toNextStep();
+                        outputString += "\nHold the phone steady\n";
+                        outputString += "Current steady time: " + mySensorManager.getStationaryTimer();
+                        if (mySensorManager.isThisStepFail()) {
+                            vibrator.vibrate(mySensorManager.getVibrateTime());
+                            onStepFailed();
+                        } else {
+                            if (mySensorManager.isDoctorStepCompleted()) {
+                                toNextStep();
+                            }
                         }
                     }
-
                 }
+
             }
 
             currentDataView.setText(outputString);
