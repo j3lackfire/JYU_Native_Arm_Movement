@@ -1,5 +1,7 @@
 package Logic;
 
+import android.support.annotation.Nullable;
+
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonMethod;
@@ -139,6 +141,7 @@ public class SavedValue {
     }
 
     //get this class from a JSON string
+    @Nullable
     public static SavedValue fromJson(String jsonString) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(JsonMethod.ALL, JsonAutoDetect.Visibility.ANY);

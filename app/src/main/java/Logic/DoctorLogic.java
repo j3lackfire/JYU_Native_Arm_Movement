@@ -17,7 +17,7 @@ public class DoctorLogic {
         return instance;
     }
 
-    private SavedValue[] previouslySavedValue;
+    private SavedValue[] previouslySavedValue = new SavedValue[6];
 
     private DoctorStep currentDoctorStep = DoctorStep.Not_Initialized;
 
@@ -27,6 +27,7 @@ public class DoctorLogic {
 
     public void prepareDoctorLogic() {
         currentDoctorStep = DoctorStep.Reading_Instruction;
+
     }
 
     public void toNextStep() { currentDoctorStep = getNextDoctorStep(); }

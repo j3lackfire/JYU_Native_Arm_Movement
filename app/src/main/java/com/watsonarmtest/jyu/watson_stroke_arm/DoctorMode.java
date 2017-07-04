@@ -111,6 +111,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         //get the position data and display it as string
         DoctorLogic.getInstance().toNextStep();
         mySensorManager.toNextStep();
+        hideEmergency();
         if (DoctorLogic.getInstance().getCurrentDoctorStep() == DoctorStep.Finish) {
             String display = "Current setup step: " + DoctorLogic.getInstance().getCurrentDoctorStep();
             display += "\n------------\nThe doctor mode is finish, you are healthy.";
