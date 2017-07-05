@@ -188,6 +188,7 @@ public class MySensorManager {
         positionTimer += deltaTime;
         stationaryTimer += deltaTime;
         currentStepTimer += deltaTime;
+        shouldVibratePhone = false;
         if (positionTimer >= refreshTimeMili) {
             //if the system is tracking motion, check if the phone has reached the target position
             //if the system is not tracking motion, check if there are any significant movement appear
@@ -201,14 +202,26 @@ public class MySensorManager {
                 }
             } else {
                 //check if there are significant movement
-                if (isSignificantMovementDetected()) {
-                    isStepFail = true;
-                    //reset the timer
-                    stationaryTimer = 0;
-                    //vibrate the phone
+                if (isPhoneMovementDetected()) {
                     shouldVibratePhone = true;
+                }
+                //for the right hand down and left hand down step,
+                // we need the user to move the phone to the first position, and hold the phone still for 2 seconds
+                if (DoctorLogic.getInstance().getCurrentDoctorStep() == DoctorStep.Right_Hand_Down ||
+                        DoctorLogic.getInstance().getCurrentDoctorStep() == DoctorStep.Left_Hand_Down) {
+                    if (isPhoneMovementDetected()) {
+                        stationaryTimer = 3000;
+                    }
                 } else {
-                    shouldVibratePhone = false;
+                    if (isSignificantMovementDetected()) {
+                        isStepFail = true;
+                        //reset the timer
+                        stationaryTimer = 0;
+                        //vibrate the phone
+                        shouldVibratePhone = true;
+                    } else {
+                        shouldVibratePhone = false;
+                    }
                 }
             }
             //save the new data

@@ -242,6 +242,8 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
                     }
                     //if the phone is stationary for a long enough period of time,
                     //we save the position data
+                    //after saving the position data, we only proceed to tracking the next step if we see the user
+                    //have saved their position.
                     if (mySensorManager.shouldRegisterUserPosition()) {
                         saveUserPositionData();
                         playNextStepAudio(SetupLogic.getInstance().getCurrentSetupStep());

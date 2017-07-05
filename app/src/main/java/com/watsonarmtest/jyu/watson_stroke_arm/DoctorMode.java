@@ -30,6 +30,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
 
     //Emergency number to call. Should be 112 but right now, it's Duc's number
     private String emergencyNumber = "+358469556804";
+    private boolean isStepFailed = false;
 
     //report field
     private TextView currentDataView;
@@ -127,11 +128,13 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         displayString += sharedPref.getString(DoctorLogic.getInstance().getSetupKey(DoctorLogic.getInstance().getCurrentDoctorStep()), "-");
         savedDataView.setText(displayString);
+        isStepFailed = false;
     }
 
     private void onStepFailed() {
         callEmergencyButton.setVisibility(Button.VISIBLE);
         playFailAudio();
+        isStepFailed = true;
     }
 
     private void hideEmergency() {
@@ -240,7 +243,8 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
             String outputString = "Current time: " + currentTime;
             mySensorManager.updateSensorManagerDoctorMode(deltaTime);
             if (DoctorLogic.getInstance().isTrackingMotion()) {
-                if (mySensorManager.isThisStepFail()) {
+
+                if (isStepFailed) {
                     outputString = "\nCurrent step failed" +
                             "\nProcess to the next position and press NEXT STEP" +
                             "\nPress call emergency if you feel dangerous";
@@ -267,8 +271,10 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
                             }
                         }
                     }
+                    if (mySensorManager.getVibrateTime() > 0) {
+                        vibrator.vibrate(mySensorManager.getVibrateTime());
+                    }
                 }
-
             }
 
             currentDataView.setText(outputString);
