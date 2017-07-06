@@ -235,7 +235,7 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
                     setupReportText.setText(setupReportDisplayText);
 
                     //track the motion and stuffs
-                    mySensorManager.updateSensorManager(deltaTime);
+                    mySensorManager.updateSensorManagerSetupMode(deltaTime);
                     //if the phone is moving, we need to vibrate it
                     if (mySensorManager.getVibrateTime() > 0) {
                         vibrator.vibrate(mySensorManager.getVibrateTime());
@@ -252,7 +252,7 @@ public class SetupMode extends AppCompatActivity implements SensorEventListener 
                 } else {
                     //if the data is saved, that means this step is completed,
                     //then we wait until the user start moving the phone to track the next position again
-                    mySensorManager.updateSensorManager(deltaTime);
+                    mySensorManager.updateSensorManagerSetupMode(deltaTime);
                     if (mySensorManager.getVibrateTime() > 0) {
                         vibrator.vibrate(mySensorManager.getVibrateTime());
                         toNextStep();

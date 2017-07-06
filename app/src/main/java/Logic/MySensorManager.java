@@ -22,11 +22,12 @@ public class MySensorManager {
     private long previousTime = -1;
     /*
     The data from the Android sensor is saved here
-    Because we can not access the sensor data directly (I don't know why)
+    Because we can not access the sensor data directly (there is no Android's API to access it)
     We can only access it only when the sensor value is changed.
-    That's why I have to saved it here
+    That's why I have to cached it here
     */
     private double[] cachedAccelerationData = {-1,-1,-1};
+    //because there are many type of event changes, so we need to have accurate deltaTime value to calculate the position
     private long previouslyChangedAccelerationTime = -1;
     private double[] cachedGyroData = {-1,-1,-1};
     private double[] cachedRotationData = {-1,-1,-1,-1};
@@ -35,34 +36,39 @@ public class MySensorManager {
 
     private long positionTimer = 0; //cached value, don't worry about it.
     private long cachedDeltaTime = -1;
-    private long stationaryTimer = 0; //cached value, don't worry about it.
+    private long stationaryTimer = 0; //Time the phone has been stationary.
     private long currentStepTimer = 0; //how long the user have been at this step
-    private long maximumStepTimer = 5000; //the maximum time the use can stay in a step
+    private long maximumStepTimer = 5000; //the maximum time the use can stay in a step. If excedd this number, step is fail
+    //average out the acceleration value out so we can have a more stable stats. Not seem to be working very well though
     private ArrayList<Float> averageAcceX = new ArrayList<>();
     private ArrayList<Float> averageAcceY = new ArrayList<>();
     private ArrayList<Float> averageAcceZ = new ArrayList<>();
     /*
     Configuration data for the sensor recording step
     */
+    //update rate of the sensor.
     private long refreshTimeMili = 50; //50 mili seconds - 0.05 seconds
-    private long minimumRefreshRate = 200; //200 miliseconds
+    //the sensor value is recorded and updated every 40 or so mili seconds.
+    //we need to collect serveral values at once and then average them out
+    private long sensorRefreshRate = 200; //200 miliseconds
 
+    //Stationary time for Setup mode
     private long maxStationaryTime = 2000; //milliseconds, 2000 is 2 second
-    private long doctorStationaryTime =5000; // hold the phone still for
+    //Stationary time for doctor mode
+    private long doctorStationaryTime = 5000; // hold the phone still for
 
     //if the current value goes beyond this value, mark as the phone is still moving.
     private double maximumDeltaAcceleration = 0.5;
     private double maximumDeltaGyro = 1;
 
-    //    private double[] savedAccelerationData = {-1,-1,-1};
     private double[] savedGyroData = {-1,-1,-1};
-
     private boolean shouldVibratePhone = false;
 
     //called on On Created
     public MySensorManager(SensorManager _sensorManager) {
         accelerationSensorType = Sensor.TYPE_LINEAR_ACCELERATION;
         sensorManager = _sensorManager;
+
         acceSensor = sensorManager.getDefaultSensor(accelerationSensorType);
         gyroSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
@@ -90,6 +96,7 @@ public class MySensorManager {
     //this function should be called several time per second
     public void onSensorChanged(SensorEvent event, long time) {
         previousTime = time;
+        //the event time stamp is in Nano Second.
         long timeStampMili = event.timestamp / 1000000;
 
         if (event.sensor.getType() == accelerationSensorType) { //sensor event type is accelerometer
@@ -108,7 +115,7 @@ public class MySensorManager {
                 cachedDeltaTime += deltaTime;
             }
             addCacheValueData(event.values);
-            if (cachedDeltaTime >= minimumRefreshRate) {
+            if (cachedDeltaTime >= sensorRefreshRate) {
                 float[] averageData = getAverageData();
                 PositionManager.getInstance().updatePosition(
                         averageData[0],
@@ -139,7 +146,7 @@ public class MySensorManager {
         averageAcceZ.add(acceData[2]);
     }
 
-    //same as the function above
+    //same as the function above.
     private float[] getAverageData() {
         float averageX = 0;
         float averageY = 0;
@@ -155,7 +162,7 @@ public class MySensorManager {
         return new float[] {averageX, averageY, averageZ};
     }
 
-    //same ...
+    //same .... After getting the data, we need to reset it
     private void resetCachedValueData() {
         averageAcceX.clear();
         averageAcceY.clear();
@@ -164,8 +171,8 @@ public class MySensorManager {
     }
 
     //function to be called on every frame.
-    //used to check the timer and responsible for changing the steps
-    public void updateSensorManager(long deltaTime) {
+    //used to check the timer and responsible for changing the states of the mode.
+    public void updateSensorManagerSetupMode(long deltaTime) {
         positionTimer += deltaTime;
         stationaryTimer += deltaTime;
         if (positionTimer >= refreshTimeMili) {
@@ -290,7 +297,7 @@ public class MySensorManager {
         return false;
     }
 
-    //ultilities function to make display easier to read
+    //utilities function to make display easier to read
     private void roundNumber() {
         for (int i = 0; i < 3; i ++) {
             cachedAccelerationData[i] = Math.round(cachedAccelerationData[i]*100)/100d;

@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -49,6 +50,9 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
 
     Button nextStepButton;
     Button callEmergencyButton;
+
+    private final int REQUEST_CALL_PHONE_PERMISSION = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,14 +153,36 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
             startActivity(callIntent);
         } else {
             //request the permission
-            // REQUEST_CALL_PHONE is an
+            // REQUEST_CALL_PHONE_PERMISSION is an
             // app-defined int constant. The callback method gets the
             // result of the request.
-            int REQUEST_CALL_PHONE = 0;
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CALL_PHONE}, REQUEST_CALL_PHONE);
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CALL_PHONE}, REQUEST_CALL_PHONE_PERMISSION);
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_CALL_PHONE_PERMISSION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    callEmergencyNumber();
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
     private void playAudio(DoctorStep currentSetupStep) {
         if (nextStepAudio != null) {
             nextStepAudio.stop();
