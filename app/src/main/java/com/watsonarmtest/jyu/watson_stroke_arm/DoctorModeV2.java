@@ -2,15 +2,16 @@ package com.watsonarmtest.jyu.watson_stroke_arm;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.os.Vibrator;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -19,58 +20,67 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorManager;
 
-import Logic.DoctorLogic;
+import Logic.DoctorLogicV2;
 import Logic.DoctorStep;
+import Logic.DoctorStepV2;
 import Logic.MySensorManager;
+import Logic.MySensorManagerV2;
 
-public class DoctorMode extends AppCompatActivity implements SensorEventListener {
-
+/*
+ * It seems like the first approach with Setup mode and Doctor mode is NOT working very well because
+ * the sensor data are very noisy and inaccurate.
+ * It is impossible to track the data from the sensor and gives out accurate data of the position of the phone
+ * The only thing that we can be sure is to know if the phone is moving or not.
+ * So, here comes the second approach, the Doctor mode v2. This step is nice since it does not even require
+ * the setup mode or anything, it just works.
+ */
+public class DoctorModeV2 extends AppCompatActivity implements SensorEventListener {
     //Emergency number to call. Should be 112 but right now, it's Duc's number
     private String emergencyNumber = "+358469556804";
     private final int REQUEST_CALL_PHONE_PERMISSION = 0; //used for the request phone call permission call back
-    private boolean isStepFailed = false;
 
-    //report field
-    private TextView currentDataView;
-    private TextView savedDataView;
+    //sensor and stuff
+    private MySensorManagerV2 mySensorManager;
+    private MediaPlayer nextStepAudio = null;
 
-    //Handler, stuff that will run for very long
+    //Handler, a custom thread that will run side by side with this main thread
     private Handler handler;
     private Vibrator vibrator;
 
-    private long startTime;
-    private long currentTime;
+    private long startTime; //the time the application start, cache in for calculation
+    private long currentTime; //current time since the main activity has started.
 
-    //sensor and stuff
-    private MySensorManager mySensorManager;
-    private MediaPlayer nextStepAudio;
-
+    //UI and button and stuffs
     private Button nextStepButton;
     private Button callEmergencyButton;
+    private TextView textInformation;
 
+    //cached variables, for calculating and stuffs
+    private boolean isStepFailed = false;
+    private boolean isCurrentStepCompleted = false;
+    private boolean isAudioPlayed = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_doctor_mode);
+        setContentView(R.layout.activity_doctor_mode_v2);
 
-        //the logic
-        DoctorLogic.getInstance().prepareDoctorLogic();
-
-        //handler for time action and threading
+        //Sensor and other logic stuffs
         handler = new Handler();
         startTime = SystemClock.uptimeMillis();
         handler.postDelayed(runnable, 0);
 
-        //register the sensor
-        mySensorManager = new MySensorManager((SensorManager)getSystemService(Context.SENSOR_SERVICE));
+        mySensorManager = new MySensorManagerV2((SensorManager)getSystemService(Context.SENSOR_SERVICE));
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
+        //prepare the doctor logic
+        DoctorLogicV2.getInstance().prepareDoctorLogic();
+
         //the buttons and UI stuffs
-        Button backToMainPageButton = (Button) findViewById(R.id.button_back_to_main_page);
+        textInformation = (TextView) findViewById(R.id.v2_current_information);
+        textInformation.setText(DoctorLogicV2.getInstance().getInstructionText());
+
+        Button backToMainPageButton = (Button) findViewById(R.id.v2_button_main_page);
         backToMainPageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,7 +88,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
             }
         });
 
-        nextStepButton = (Button) findViewById(R.id.doctor_mode_button_next_step);
+        nextStepButton = (Button) findViewById(R.id.v2_button_next_step);
         nextStepButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,7 +96,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
             }
         });
 
-        callEmergencyButton = (Button) findViewById(R.id.button_call_emergency_number);
+        callEmergencyButton = (Button) findViewById(R.id.v2_button_call_emergency);
         callEmergencyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,23 +104,15 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
             }
         });
         callEmergencyButton.setVisibility(Button.INVISIBLE);
-
-        currentDataView = (TextView) findViewById(R.id.current_sensor_data);
-        savedDataView = (TextView) findViewById(R.id.saved_sensor_data);
-
-        savedDataView.setText("Current setup step: " + DoctorLogic.getInstance().getCurrentDoctorStep());
-
-        //get the previously saved data
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        DoctorLogic.getInstance().prepareAllSavedValue(sharedPref);
     }
 
+    //-----------------Buttons stuffs ----------------
     private void goToMainPage() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
-
+    //hide the call emergency button
     private void hideEmergency() {
         callEmergencyButton.setVisibility(Button.INVISIBLE);
     }
@@ -130,6 +132,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         }
     }
 
+    //the request permission call back.
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -142,7 +145,6 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
                     callEmergencyNumber();
 
                 } else {
-
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
@@ -154,37 +156,36 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         }
     }
 
-    private void playAudio(DoctorStep currentSetupStep) {
+    //------------Audio stuffs ----------------
+    private void playAudio(DoctorStepV2 currentSetupStep) {
         if (nextStepAudio != null) {
             nextStepAudio.stop();
         }
         switch (currentSetupStep) {
+            case Calibration:
+                //should said something
+                nextStepAudio = MediaPlayer.create(DoctorModeV2.this, R.raw.next_step);
+                break;
             case Right_Hand_Down:
-                nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.right_hand_down_position);
-                break;
-            case Right_Hand_Down_To_Front:
-                nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.right_hand_front_position);
-                break;
-            case Right_Hand_Front_To_Up:
-                nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.right_hand_up_position);
-                break;
-            case Left_Hand_Down:
-                nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.left_hand_down_position);
-                break;
-            case Left_Hand_Down_To_Front:
-                nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.left_hand_front_position);
-                break;
-            case Left_Hand_Front_To_Up:
-                nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.left_hand_up_position);
-                break;
-            case Finish:
-                nextStepAudio = MediaPlayer.create(DoctorMode.this,R.raw.finish);
+                nextStepAudio = MediaPlayer.create(DoctorModeV2.this,R.raw.right_hand_down_position);
                 break;
             case Right_Hand_Front:
-            case Left_Hand_Front:
-            case Left_Hand_Up:
+                nextStepAudio = MediaPlayer.create(DoctorModeV2.this,R.raw.right_hand_front_position);
+                break;
             case Right_Hand_Up:
-                nextStepAudio = MediaPlayer.create(DoctorMode.this, R.raw.position_reached_hold_5sec);
+                nextStepAudio = MediaPlayer.create(DoctorModeV2.this,R.raw.right_hand_up_position);
+                break;
+            case Left_Hand_Down:
+                nextStepAudio = MediaPlayer.create(DoctorModeV2.this,R.raw.left_hand_down_position);
+                break;
+            case Left_Hand_Front:
+                nextStepAudio = MediaPlayer.create(DoctorModeV2.this,R.raw.left_hand_front_position);
+                break;
+            case Left_Hand_Up:
+                nextStepAudio = MediaPlayer.create(DoctorModeV2.this,R.raw.left_hand_up_position);
+                break;
+            case Finish:
+                nextStepAudio = MediaPlayer.create(DoctorModeV2.this,R.raw.finish);
                 break;
 
             case Reading_Instruction:
@@ -199,7 +200,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         if (nextStepAudio != null ){
             nextStepAudio.stop();
         }
-        nextStepAudio = MediaPlayer.create(DoctorMode.this, R.raw.failed_press_next);
+        nextStepAudio = MediaPlayer.create(DoctorModeV2.this, R.raw.failed_press_next);
         nextStepAudio.start();
     }
 
@@ -220,7 +221,7 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        mySensorManager.onSensorChanged(event, currentTime);
+        mySensorManager.onSensorChanged(event);
     }
 
     @Override
@@ -229,83 +230,78 @@ public class DoctorMode extends AppCompatActivity implements SensorEventListener
         // Do nothing
     }
 
-    //-------------------Logic -------------------------
+    //------------logic stuffs.-----------------------------
     private void toNextStep() {
         //get the position data and display it as string
-        DoctorLogic.getInstance().toNextStep();
+        DoctorLogicV2.getInstance().toNextStep();
         mySensorManager.toNextStep();
-        playAudio(DoctorLogic.getInstance().getCurrentDoctorStep() );
-        hideEmergency();
-        if (DoctorLogic.getInstance().getCurrentDoctorStep() == DoctorStep.Finish) {
-            String display = "Current setup step: " + DoctorLogic.getInstance().getCurrentDoctorStep();
-            display += "\n------------\nThe doctor mode is finish, you are healthy.";
-            savedDataView.setText(display);
-            nextStepButton.setVisibility(Button.INVISIBLE);
-            return;
+        if (!isAudioPlayed) {
+            playAudio(DoctorLogicV2.getInstance().getCurrentDoctorStep() );
         }
-        String displayString = "Current setup step: " + DoctorLogic.getInstance().getCurrentDoctorStep();
-        displayString += "\n---------\nThe saved data for this position is: \n";
 
-        //load the data
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        displayString += sharedPref.getString(DoctorLogic.getInstance().getSetupKey(DoctorLogic.getInstance().getCurrentDoctorStep()), "-");
-        savedDataView.setText(displayString);
         isStepFailed = false;
+        isCurrentStepCompleted = false;
+        isAudioPlayed = false;
+        hideEmergency();
+
+        String display = "Current setup step: " + DoctorLogicV2.getInstance().getCurrentDoctorStep();
+
+        if (DoctorLogicV2.getInstance().getCurrentDoctorStep() == DoctorStepV2.Finish) {
+            display += "\n------------\nThe doctor mode is finish, you are healthy.";
+            nextStepButton.setVisibility(Button.INVISIBLE);
+        } else {
+            display += "\n---------\n" + DoctorLogicV2.getInstance().getInstructionText();
+        }
+        textInformation.setText(display);
     }
 
     private void onStepFailed() {
         callEmergencyButton.setVisibility(Button.VISIBLE);
         playFailAudio();
         isStepFailed = true;
+        isCurrentStepCompleted = true;
     }
 
+    private void onStepCompleted() {
+        playAudio(DoctorLogicV2.getInstance().getNextDoctorStep());
+        isCurrentStepCompleted = true;
+    }
 
     //--------Second thread to count the time--------------
     public Runnable runnable = new Runnable() {
 
         public void run() {
-
             long deltaTime = currentTime;
             currentTime = SystemClock.uptimeMillis() - startTime;
             deltaTime = currentTime - deltaTime;
             String outputString = "Current time: " + currentTime;
-            mySensorManager.updateSensorManagerDoctorMode(deltaTime);
-            if (DoctorLogic.getInstance().isTrackingMotion()) {
-
-                if (isStepFailed) {
-                    outputString = "\nCurrent step failed" +
-                            "\nProcess to the next position and press NEXT STEP" +
-                            "\nPress call emergency if you feel dangerous";
-                } else {
-                    if (DoctorLogic.getInstance().shouldTrackPosition()) {
-                        //check if the current position match the saved position.
-                        outputString += "\n" + mySensorManager.getSensorDataJSONPretty();
-                        if (mySensorManager.isThisStepFail()) {
-                            onStepFailed();
-                        } else {
-                            if (mySensorManager.isDoctorStepCompleted()) {
-                                toNextStep();
-                            }
-                        }
-                    } else {
-                        outputString += "\nHold the phone steady\n";
-                        outputString += "Current steady time: " + mySensorManager.getStationaryTimer();
-                        if (mySensorManager.isThisStepFail()) {
-                            vibrator.vibrate(mySensorManager.getVibrateTime());
-                            onStepFailed();
-                        } else {
-                            if (mySensorManager.isDoctorStepCompleted()) {
-                                toNextStep();
-                            }
-                        }
-                    }
+            if (DoctorLogicV2.getInstance().isTrackingMotion()) {
+                mySensorManager.updateSensorManager(deltaTime);
+                if (!isCurrentStepCompleted) {
                     if (mySensorManager.getVibrateTime() > 0) {
                         vibrator.vibrate(mySensorManager.getVibrateTime());
                     }
+                    if (mySensorManager.isStepCompleted())  {
+                        onStepCompleted();
+                    }
+                    if (mySensorManager.isStepFail()) {
+                        onStepFailed();
+                    }
+                } else {
+                    if (isStepFailed) {
+                        outputString += "\n-------------\nCurrent step failed" +
+                                "\nProcess to the next position and press NEXT STEP" +
+                                "\nPress call emergency if you feel dangerous";
+                    } else {
+                        outputString += "\n-----------\n" +
+                                "Current step completed, follow the instruction to the next step!";
+                        if (mySensorManager.getVibrateTime() > 0) {
+                            vibrator.vibrate(mySensorManager.getVibrateTime());
+                            toNextStep();
+                        }
+                    }
                 }
             }
-
-            currentDataView.setText(outputString);
             handler.postDelayed(this, 0);
         }
 

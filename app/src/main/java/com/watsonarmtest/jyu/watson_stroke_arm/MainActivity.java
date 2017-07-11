@@ -31,6 +31,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //goto doctor mode v2
+        Button doctorModeV2Button = (Button) findViewById(R.id.button_doctor_mode_v2);
+        doctorModeV2Button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                enterDoctorModeV2();
+            }
+        });
+
         //go to test mode
         Button testModeButton = (Button) findViewById(R.id.button_enter_test_mode);
         testModeButton.setOnClickListener(new View.OnClickListener() {
@@ -39,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
                 enterTestMode();
             }
         });
-
     }
 
     private void enterSetupMode() {
@@ -50,6 +58,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void enterDoctorMode() {
         Intent intent = new Intent(this, DoctorMode.class);
+        startActivity(intent);
+    }
+
+    private void enterDoctorModeV2() {
+        Intent intent = new Intent(this, DoctorModeV2.class);
         startActivity(intent);
     }
 

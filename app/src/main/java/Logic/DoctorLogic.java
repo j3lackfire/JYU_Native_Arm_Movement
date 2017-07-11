@@ -27,7 +27,6 @@ public class DoctorLogic {
 
     public void prepareDoctorLogic() {
         currentDoctorStep = DoctorStep.Reading_Instruction;
-
     }
 
     public void toNextStep() { currentDoctorStep = getNextDoctorStep(); }
@@ -156,7 +155,6 @@ public class DoctorLogic {
                 return previouslySavedValue[5];
         }
     }
-
 
     ///if the phone is moving, check if it reaches the destined position
     public boolean shouldTrackPosition() {
