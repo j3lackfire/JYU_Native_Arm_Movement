@@ -37,7 +37,7 @@ import Logic.MySensorManagerV2;
  */
 public class DoctorModeV2 extends AppCompatActivity implements SensorEventListener {
     //Emergency number to call. Should be 112 but right now, it's Duc's number
-    private String emergencyNumber = "+358469556804";
+    private String emergencyNumber = "911";
     private final int REQUEST_CALL_PHONE_PERMISSION = 0; //used for the request phone call permission call back
 
     //sensor and stuff
@@ -246,6 +246,10 @@ public class DoctorModeV2 extends AppCompatActivity implements SensorEventListen
 
         String display = "Current setup step: " + DoctorLogicV2.getInstance().getCurrentDoctorStep();
 
+        if (DoctorLogicV2.getInstance().getCurrentDoctorStep() != DoctorStepV2.Calibration) {
+            nextStepButton.setVisibility(View.INVISIBLE);
+        }
+
         if (DoctorLogicV2.getInstance().getCurrentDoctorStep() == DoctorStepV2.Finish) {
             display += "\n------------\nThe doctor mode is finish, you are healthy.";
             nextStepButton.setVisibility(Button.INVISIBLE);
@@ -257,6 +261,8 @@ public class DoctorModeV2 extends AppCompatActivity implements SensorEventListen
 
     private void onStepFailed() {
         callEmergencyButton.setVisibility(Button.VISIBLE);
+        nextStepButton.setVisibility(View.VISIBLE);
+
         playFailAudio();
         isStepFailed = true;
         isCurrentStepCompleted = true;
@@ -275,7 +281,8 @@ public class DoctorModeV2 extends AppCompatActivity implements SensorEventListen
             currentTime = SystemClock.uptimeMillis() - startTime;
             deltaTime = currentTime - deltaTime;
             String outputString = "Current step: " + DoctorLogicV2.getInstance().getCurrentDoctorStep() +
-                    "\n----------------\nCurrent time: " + currentTime;
+                    "\n----------------\nCurrent time: " + currentTime +
+                    "\nStationary timer: " + mySensorManager.getStationaryTimer();
             if (DoctorLogicV2.getInstance().isTrackingMotion()) {
                 mySensorManager.updateSensorManager(deltaTime);
                 if (!isCurrentStepCompleted) {

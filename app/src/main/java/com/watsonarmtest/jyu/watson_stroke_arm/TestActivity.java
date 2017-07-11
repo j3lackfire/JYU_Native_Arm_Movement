@@ -41,7 +41,7 @@ public class TestActivity extends AppCompatActivity implements SensorEventListen
     private float[] accel = new float[]{0,0,0};
 
     //email stuffs
-    private String defaultEmail = "j3lackfire@gmail.com";
+    private String defaultEmail = "";
     private String savedEmailKey = "SAVED_USER_EMAIL";
 
     private Button buttonRecording;

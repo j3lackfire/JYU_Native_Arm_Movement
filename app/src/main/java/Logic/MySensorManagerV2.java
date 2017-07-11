@@ -112,6 +112,8 @@ public class MySensorManagerV2 {
         return currentStepTimer > maximumStepTimer;
     }
 
+    public long getStationaryTimer() {return stationaryTimer;}
+
     //next step is set, reset everything
     public void toNextStep() {
         stationaryTimer = 0;
