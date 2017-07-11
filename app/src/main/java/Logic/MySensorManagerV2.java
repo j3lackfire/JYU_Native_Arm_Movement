@@ -106,7 +106,7 @@ public class MySensorManagerV2 {
         }
     }
 
-    public boolean isStepCompleted() { return stationaryTimer >= maximumStepTimer; }
+    public boolean isStepCompleted() { return stationaryTimer >= maxStationaryTime; }
 
     public boolean isStepFail() {
         return currentStepTimer > maximumStepTimer;
@@ -139,7 +139,7 @@ public class MySensorManagerV2 {
 
     }
 
-    private boolean isSignificantMovementDetected() {
+    public boolean isSignificantMovementDetected() {
         for (int i = 0; i < 3; i ++) {
             if (Math.abs(cachedAccelerationData[i]) > maximumDeltaAcceleration * 2) {
                 return true;

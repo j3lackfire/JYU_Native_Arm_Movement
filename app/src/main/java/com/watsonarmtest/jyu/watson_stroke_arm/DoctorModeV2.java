@@ -274,7 +274,8 @@ public class DoctorModeV2 extends AppCompatActivity implements SensorEventListen
             long deltaTime = currentTime;
             currentTime = SystemClock.uptimeMillis() - startTime;
             deltaTime = currentTime - deltaTime;
-            String outputString = "Current time: " + currentTime;
+            String outputString = "Current step: " + DoctorLogicV2.getInstance().getCurrentDoctorStep() +
+                    "\n----------------\nCurrent time: " + currentTime;
             if (DoctorLogicV2.getInstance().isTrackingMotion()) {
                 mySensorManager.updateSensorManager(deltaTime);
                 if (!isCurrentStepCompleted) {
@@ -295,13 +296,14 @@ public class DoctorModeV2 extends AppCompatActivity implements SensorEventListen
                     } else {
                         outputString += "\n-----------\n" +
                                 "Current step completed, follow the instruction to the next step!";
-                        if (mySensorManager.getVibrateTime() > 0) {
+                        if (mySensorManager.isSignificantMovementDetected()) {
                             vibrator.vibrate(mySensorManager.getVibrateTime());
                             toNextStep();
                         }
                     }
                 }
             }
+            textInformation.setText(outputString);
             handler.postDelayed(this, 0);
         }
 
