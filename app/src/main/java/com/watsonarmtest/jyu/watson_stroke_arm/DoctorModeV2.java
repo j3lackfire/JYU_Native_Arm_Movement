@@ -21,11 +21,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import Logic.DoctorLogicV2;
-import Logic.DoctorStep;
-import Logic.DoctorStepV2;
-import Logic.MySensorManager;
-import Logic.MySensorManagerV2;
+import Logic.Version2.DoctorLogicV2;
+import Logic.Version2.DoctorStepV2;
+import Logic.Version2.MySensorManagerV2;
 
 /*
  * It seems like the first approach with Setup mode and Doctor mode is NOT working very well because

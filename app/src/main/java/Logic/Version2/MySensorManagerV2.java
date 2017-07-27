@@ -1,4 +1,4 @@
-package Logic;
+package Logic.Version2;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;

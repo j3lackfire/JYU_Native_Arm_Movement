@@ -1,4 +1,4 @@
-package Logic;
+package Logic.Version2;
 
 /**
  * Created by Le Pham Minh Duc on 7/7/2017.
