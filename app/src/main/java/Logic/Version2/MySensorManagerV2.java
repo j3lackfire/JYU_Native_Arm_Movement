@@ -44,11 +44,21 @@ public class MySensorManagerV2 {
     //Stationary time for doctor mode
     private long doctorStationaryTime = 5000; // hold the phone still for
 
+    //*******************************
+    //----TOMMI ---- IT'S HERE ------
+    //*******************************
     //if the current value goes beyond this value, mark as the phone is still moving.
     private final double maximumDeltaAcceleration = 0.5;
+    //*******************************
+    // CHANGE THIS VALUE TOMMI !!!!
+    //*******************************
+
+
     private final double maximumDeltaGyro = 1;
 
     private boolean shouldVibratePhone = false;
+
+    private double[] calibratedSensorValue = {0,0,0};
 
     //called on On Created
     public MySensorManagerV2(SensorManager _sensorManager) {
@@ -158,6 +168,10 @@ public class MySensorManagerV2 {
             cachedAccelerationData[i] = Math.round(cachedAccelerationData[i]*100)/100d;
             cachedGyroData[i] = Math.round(cachedGyroData[i]*100d)/100d;
         }
+    }
+
+    public void doCalibration() {
+
     }
 
 }

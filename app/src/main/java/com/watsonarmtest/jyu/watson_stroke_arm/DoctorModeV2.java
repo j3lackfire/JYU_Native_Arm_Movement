@@ -161,8 +161,8 @@ public class DoctorModeV2 extends AppCompatActivity implements SensorEventListen
         }
         switch (currentSetupStep) {
             case Calibration:
-                //should said something
-                nextStepAudio = MediaPlayer.create(DoctorModeV2.this, R.raw.next_step);
+                //say like, this is the calibrating steps
+//                nextStepAudio = MediaPlayer.create(DoctorModeV2.this, R.raw.next_step);
                 break;
             case Right_Hand_Down:
                 nextStepAudio = MediaPlayer.create(DoctorModeV2.this,R.raw.right_hand_down_position);
@@ -306,6 +306,10 @@ public class DoctorModeV2 extends AppCompatActivity implements SensorEventListen
                             toNextStep();
                         }
                     }
+                }
+            } else {
+                if (DoctorLogicV2.getInstance().getCurrentDoctorStep() == DoctorStepV2.Calibration) {
+
                 }
             }
             textInformation.setText(outputString);

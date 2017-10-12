@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Arm movement proto master.iml" filepath="$PROJECT_DIR$/Arm movement proto master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JYU_Native_Arm_Movement.iml" filepath="$PROJECT_DIR$/JYU_Native_Arm_Movement.iml" />
       <module fileurl="file://$PROJECT_DIR$/Watson_Stroke_Arm.iml" filepath="$PROJECT_DIR$/Watson_Stroke_Arm.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
