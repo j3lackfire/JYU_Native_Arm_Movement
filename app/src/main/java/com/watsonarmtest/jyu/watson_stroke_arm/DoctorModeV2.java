@@ -163,6 +163,7 @@ public class DoctorModeV2 extends AppCompatActivity implements SensorEventListen
             case Calibration:
                 //say like, this is the calibrating steps
 //                nextStepAudio = MediaPlayer.create(DoctorModeV2.this, R.raw.next_step);
+                nextStepAudio = null;
                 break;
             case Right_Hand_Down:
                 nextStepAudio = MediaPlayer.create(DoctorModeV2.this,R.raw.right_hand_down_position);
@@ -191,7 +192,9 @@ public class DoctorModeV2 extends AppCompatActivity implements SensorEventListen
                 nextStepAudio = null;
 
         }
-        nextStepAudio.start();
+        if (nextStepAudio != null) {
+            nextStepAudio.start();
+        }
     }
 
     private void playFailAudio() {
@@ -284,6 +287,7 @@ public class DoctorModeV2 extends AppCompatActivity implements SensorEventListen
             if (DoctorLogicV2.getInstance().isTrackingMotion()) {
                 mySensorManager.updateSensorManager(deltaTime);
                 if (!isCurrentStepCompleted) {
+                    outputString += "\n" + mySensorManager.getProgressBar();
                     if (mySensorManager.getVibrateTime() > 0) {
                         vibrator.vibrate(mySensorManager.getVibrateTime());
                     }
@@ -307,9 +311,12 @@ public class DoctorModeV2 extends AppCompatActivity implements SensorEventListen
                         }
                     }
                 }
-            } else {
+            }
+            else {
                 if (DoctorLogicV2.getInstance().getCurrentDoctorStep() == DoctorStepV2.Calibration) {
-
+                    mySensorManager.doCalibration();
+                    vibrator.vibrate(50);
+                    outputString = "\nCurrent calibration data\n" + mySensorManager.getCalibrationData();
                 }
             }
             textInformation.setText(outputString);

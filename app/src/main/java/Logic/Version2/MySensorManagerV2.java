@@ -6,6 +6,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 /**
  * Created by Le Pham Minh Duc on 7/7/2017.
@@ -48,7 +49,7 @@ public class MySensorManagerV2 {
     //----TOMMI ---- IT'S HERE ------
     //*******************************
     //if the current value goes beyond this value, mark as the phone is still moving.
-    private final double maximumDeltaAcceleration = 0.5;
+    private final double maximumDeltaAcceleration = 2.5;
     //*******************************
     // CHANGE THIS VALUE TOMMI !!!!
     //*******************************
@@ -171,7 +172,31 @@ public class MySensorManagerV2 {
     }
 
     public void doCalibration() {
+        for (int i = 0; i < cachedAccelerationData.length; i ++) {
+            calibratedSensorValue[i] = (cachedAccelerationData[i] + calibratedSensorValue[i])/2;
+        }
+    }
 
+    public String getCalibrationData() {
+        return  "( " + Math.round(calibratedSensorValue[0]*100)/100d + "\n"
+                + Math.round(calibratedSensorValue[1]*100)/100d + "\n"
+                + Math.round(calibratedSensorValue[2]*100)/100d + ")";
+
+    }
+
+
+    public String getProgressBar() {
+        String s = "";
+        int numberOfCharacters = 60;
+        double progress = (double)stationaryTimer / maxStationaryTime;
+        for (int i = 0; i < numberOfCharacters; i ++) {
+            if (i < progress * numberOfCharacters) {
+                s += "|";
+            } else {
+                s += ".";
+            }
+        }
+    return s;
     }
 
 }
